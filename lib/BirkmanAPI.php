@@ -49,7 +49,18 @@ class BirkmanAPI
         ]);
 
         $response = curl_exec($ch);
+        $curlErrNo = curl_errno($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
+        if ($response === false)
+        {
+            throw new Exception("cURL error {$curlErrNo} reported.");
+        }
+        if (!($httpCode >= 200 && $httpCode < 300))
+        {
+            throw new Exception("Birkman returned HTTP code {$httpCode} and body: " . PHP_EOL . $response);
+        }
 
         return $response;
     }
