@@ -1,0 +1,14 @@
+{
+    "name": "tourbuzz/birkman",
+    "description": "API wrapper for the Birkman Assessment",
+    "homepage": "https://github.com/tourbuzz/birkman-api-php",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alan Pinstein",
+            "email": "apinstein@mac.com"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {}
+}
