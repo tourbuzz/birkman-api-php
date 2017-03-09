@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetAssessmentReport releaseID="3.0" versionID="1.4" systemEnvironmentCode="Production" languageCode="en-US" xmlns="http://www.hr-xml.org/3" xmlns:oa="http://www.openapplications.org/oagis/9">
+	<oa:ApplicationArea>
+		<oa:Sender>
+			<oa:ConfirmationCode>OnError</oa:ConfirmationCode>
+			<!-- your API key goes here -->
+			<oa:AuthorizationID></oa:AuthorizationID>
+		</oa:Sender>
+		<!-- ISO 8601 formatted timestamp -->
+		<oa:CreationDateTime>2010-03-14T10:09:02.01-06:00</oa:CreationDateTime>
+	</oa:ApplicationArea>
+	<DataArea>
+		<oa:Get>
+			<oa:Expression/>
+		</oa:Get>
+		<AssessmentReport>
+			<DocumentID schemeID="UserID"></DocumentID>
+			<!-- AlternateDocumentID is optional and should not be used unless needed -->
+			<!--<AlternateDocumentID schemeID="BirkmanID"></AlternateDocumentID>-->
+			<!--<AlternateDocumentID schemeID="UserID"></AlternateDocumentID>-->
+			<UserArea>
+				<!-- 0 for false, 1 for true -->
+				<CSVOutput>0</CSVOutput>
+				<!-- 1 or more PDFFormatID tags will create those reports -->
+				<!-- Note: you may or may not have access to these PDFFormatIDs – use the catalog
+				request to determine which formats you can use here -->
+				<PDFFormatID>192012</PDFFormatID>
+			</UserArea>
+		</AssessmentReport>
+	</DataArea>
+</GetAssessmentReport>
