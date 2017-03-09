@@ -14,17 +14,17 @@
 			<oa:Expression/>
 		</oa:Get>
 		<AssessmentReport>
-			<DocumentID schemeID="UserID"></DocumentID>
+			<DocumentID schemeID="BirkmanID"></DocumentID>
 			<!-- AlternateDocumentID is optional and should not be used unless needed -->
-			<!--<AlternateDocumentID schemeID="BirkmanID"></AlternateDocumentID>-->
-			<!--<AlternateDocumentID schemeID="UserID"></AlternateDocumentID>-->
+			<!--<AlternateDocumentID schemeID="BirkmanID">6-digit code for a person</AlternateDocumentID>-->
+			<!--<AlternateDocumentID schemeID="UserID">32-digit code for a person</AlternateDocumentID>-->
 			<UserArea>
 				<!-- 0 for false, 1 for true -->
 				<CSVOutput>0</CSVOutput>
 				<!-- 1 or more PDFFormatID tags will create those reports -->
 				<!-- Note: you may or may not have access to these PDFFormatIDs – use the catalog
 				request to determine which formats you can use here -->
-				<PDFFormatID>192012</PDFFormatID>
+				<PDFFormatID></PDFFormatID>
 			</UserArea>
 		</AssessmentReport>
 	</DataArea>

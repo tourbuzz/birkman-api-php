@@ -31,6 +31,7 @@ class BirkmanAPI
 
         // send request
         $xmlAsString = $xml->asXML();
+        print $xmlAsString;
 
         $xmlStream = fopen('php://memory','r+');
         fwrite($xmlStream, $xmlAsString );
