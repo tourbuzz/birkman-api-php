@@ -9,6 +9,85 @@ class BirkmanAPI
         $this->apiKey = $apiKey;
     }
 
+    public function getAssessmentCatalog()
+    {
+        $xmlTemplate = 'GetAssessmentCatalog.xml';
+        $xmlFile = __DIR__ . "/birkman-xml-templates/{$xmlTemplate}";
+        $xml = simplexml_load_file($xmlFile);
+        if ($xml === false) throw new Exception("Unable to load XML file: {$xmlFile}");
+
+        // Configure API KEY
+        $oa = $xml->children('http://www.openapplications.org/oagis/9');
+        $oa->ApplicationArea->Sender->AuthorizationID = $this->apiKey;
+
+        // send request
+        $xmlAsString = $xml->asXML();
+        print $xmlAsString;
+
+        $xmlStream = fopen('php://memory','r+');
+        fwrite($xmlStream, $xmlAsString );
+        $dataLength = ftell($xmlStream);
+        rewind($xmlStream);
+
+        $ch = curl_init(); 
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => 'https://api.birkman.com/xml-3.0-catalog.php',
+            CURLOPT_CUSTOMREQUEST  => 'POST',
+            CURLOPT_HTTPHEADER     => [ 'Content-Type: text/xml' ],
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_INFILE         => $xmlStream,
+            CURLOPT_INFILESIZE     => $dataLength,
+            CURLOPT_UPLOAD         => 1,
+        ]);
+
+        $response = curl_exec($ch);
+        $curlErrNo = curl_errno($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($response === false)
+        {
+            throw new Exception("cURL error {$curlErrNo} reported.");
+        }
+        if (!($httpCode >= 200 && $httpCode < 300))
+        {
+            throw new Exception("Birkman returned HTTP code {$httpCode} and body: " . PHP_EOL . $response);
+        }
+
+        /*
+         *
+         *  <ShowAssessmentCatalog xmlns="http://www.hr-xml.org/3" xmlns:oa="http://www.openapplications.org/oagis/9" releaseID="3.0" versionID="1.4" systemEnvironmentCode="Production" languageCode="en-US">
+         *    <DataArea>
+         *        <oa:Show/>
+         *            <AssessmentCatalog>
+         *                  <AssessmentPackage>
+         *                          <AssessmentFulfillment>
+         *                                    <!-- Available report formats for your account are in the UserArea of this section -->
+         *                                              <UserArea>
+         *                                                          <PDFFormatIDs>
+         *                                                                        <PDFFormatID name="A guide for your sales mgr (Insights/Ind.)" languageID="en-US" type="I">2402319</PDFFormatID>
+         *
+         */
+        $assessmentCatalog = simplexml_load_string($response);
+        if ($assessmentCatalog === false)
+        {
+            throw new Exception("Error parsing response string:\n{$response}\n");
+        }
+        
+        $catalogResponse = [];
+
+        $assessmentCatalog->registerXPathNamespace('birkman', 'http://www.hr-xml.org/3');
+		$result = $assessmentCatalog->xpath('//birkman:PDFFormatID');
+        foreach ($result as $catalogEntry) {
+            $pdfFormatId = (int) $catalogEntry;
+            $pdfReportName = (string) $catalogEntry['name'];
+            $pdfReportType = (string) $catalogEntry['type'];
+            $catalogResponse[$pdfFormatId] = "[{$pdfReportType}] {$pdfReportName}";
+        }
+
+        return $catalogResponse;
+    }
+
     public function getReportData($forUserId, $reportId)
     {
         $GetAssessmentReportXMLTemplate = 'GetAssessmentReport.xml';
