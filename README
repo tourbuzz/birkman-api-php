@@ -1,8 +1,0 @@
-Using Birkman XML API
-
-Mostly we're using GetAssessmentReport to get report data, with this CURL:
-
-curl -H "Content-type: text/xml" --data-binary @GetAssessmentReport.xml https://api.birkman.com/xml-3.0-report.php
-
-It's wrapped up in a BirkmanAPI class.
-
