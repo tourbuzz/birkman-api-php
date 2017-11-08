@@ -12,5 +12,6 @@ if (count($args) !== 2)
 list($userId, $reportId) = $args;
 
 $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
-$report = $birkman->getReportData($userId, $reportId);
-print $report;
+//$report = $birkman->getReportData($userId, $reportId);
+  $birkmanData = $birkman->getUserCoreData('xx');
+  print_r($birkmanData);

@@ -14,11 +14,21 @@ A barebones PHP app that makes use of the [Silex](http://silex.sensiolabs.org/) 
 
 This application supports the [Getting Started with PHP on Heroku](https://devcenter.heroku.com/articles/getting-started-with-php) article - check it out.
 
+## Local Development
+
+```sh
+$ composer install
+$ export BIRKMAN_API_KEY=....
+$ php72 -S 0.0.0.0:8888 -t web/
+```
+
 ## Deploying
 
 Install the [Heroku Toolbelt](https://toolbelt.heroku.com/).
 
 ```sh
+$ heroku create
+$ heroku config:set BIRKMAN_API_KEY=...
 $ git push heroku master
 $ heroku open
 ```

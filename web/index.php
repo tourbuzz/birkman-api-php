@@ -1,6 +1,7 @@
 <?php
 
 require('../vendor/autoload.php');
+require('../lib/BirkmanAPI.php');
 
 $app = new Silex\Application();
 $app['debug'] = true;
@@ -16,10 +17,17 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 ));
 
 // Our web handlers
-
 $app->get('/', function() use($app) {
-  $app['monolog']->addDebug('logging output.');
   return $app['twig']->render('index.twig');
+});
+
+$app->get('/grid/{userId}', function(Silex\Application $silexApp, $userId) use($app) {
+  $app['monolog']->addDebug('Requested Birkman GRID');
+
+  $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+  $birkmanData = $birkman->getUserCoreData($userId);
+
+  return '<pre>'.print_r($birkmanData, true) . "</pre>";
 });
 
 $app->run();

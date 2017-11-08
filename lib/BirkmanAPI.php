@@ -22,7 +22,6 @@ class BirkmanAPI
 
         // send request
         $xmlAsString = $xml->asXML();
-        print $xmlAsString;
 
         $xmlStream = fopen('php://memory','r+');
         fwrite($xmlStream, $xmlAsString );
@@ -110,7 +109,6 @@ class BirkmanAPI
 
         // send request
         $xmlAsString = $xml->asXML();
-        print $xmlAsString;
 
         $xmlStream = fopen('php://memory','r+');
         fwrite($xmlStream, $xmlAsString );
@@ -143,5 +141,34 @@ class BirkmanAPI
         }
 
         return $response;
+    }
+
+    public function getUserCoreData($userId)
+    {
+        $xml = simplexml_load_string($this->getReportData($userId, 2402262));
+        //$xml = simplexml_load_file(__DIR__ . '/../grid.out.xml');
+
+        // register namespace
+        $xml->registerXPathNamespace('oa', 'http://www.hr-xml.org/3');
+		$result = $xml->xpath('//oa:GivenName');
+
+        $birkmanData = [];
+        $birkmanData['name'] = $xml->xpath('//oa:GivenName')[0] . ' ' . $xml->DataArea->AssessmentReport->AssessmentSubject->PersonName->FamilyName;
+        foreach ($xml->DataArea->AssessmentReport->AssessmentResult->AssessmentDetailedResult as $score) {
+            $item = (string) $score->Score->ScoreText;
+            $value = (string) $score->Score->ScoreNumeric;
+
+            list($section, $subsection) = explode('_', $item, 2);
+            switch ($section) {
+            case 'component':
+                $birkmanData['components'][$subsection] = $value;
+                break;
+            case 'grid':
+                $birkmanData['grid'][$subsection] = $value;
+                break;
+            }
+        }
+
+      return $birkmanData;
     }
 }
