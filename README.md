@@ -18,7 +18,7 @@ This application supports the [Getting Started with PHP on Heroku](https://devce
 
 ```sh
 $ composer install
-$ export BIRKMAN_API_KEY=....
+$ export BIRKMAN_API_KEY=... SLACK_TOKEN=...
 $ php72 -S 0.0.0.0:8888 -t web/
 ```
 
@@ -28,7 +28,7 @@ Install the [Heroku Toolbelt](https://toolbelt.heroku.com/).
 
 ```sh
 $ heroku create
-$ heroku config:set BIRKMAN_API_KEY=...
+$ heroku config:set BIRKMAN_API_KEY=... SLACK_TOKEN=...
 $ git push heroku master
 $ heroku open
 ```

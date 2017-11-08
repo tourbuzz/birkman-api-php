@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 require('../vendor/autoload.php');
 require('../lib/BirkmanAPI.php');
@@ -24,9 +25,18 @@ $app->get('/', function() use($app) {
   return $app['twig']->render('index.twig');
 });
 
-$app->get('/grid/{userId}', function(Silex\Application $silexApp, $userId) use($app) {
+$app->get('/grid/', function(Request $request) use($app) {
   $app['monolog']->addDebug('Requested Birkman GRID');
 
+  $slackToken = $request->query->get('token');
+  if ($slackToken !== getenv('SLACK_TOKEN')) {
+      $app->abort(403, "token does not match app's configured SLACK_TOKEN");
+  }
+
+  // look up "birkman id" from slack profile
+  $userId = $request->query->get('text');
+
+  // build birkman grid
   $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
   $birkmanData = $birkman->getUserCoreData($userId);
   $grid = new BirkmanGrid($birkmanData);
@@ -35,6 +45,7 @@ $app->get('/grid/{userId}', function(Silex\Application $silexApp, $userId) use($
   $imageData = ob_get_contents();
   ob_end_clean();
 
+  // return response
   return new Response(
       $imageData,
       200,
