@@ -26,7 +26,7 @@ class BirkmanGrid
         imagedestroy($this->gridIm);
     }
 
-    public function asPNG($toStream)
+    public function asPNG($toStream = NULL)
     {
         imagepng($this->gridIm, $toStream);
     }
