@@ -13,5 +13,8 @@ list($userId, $reportId) = $args;
 
 $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
 //$report = $birkman->getReportData($userId, $reportId);
-  $birkmanData = $birkman->getUserCoreData('xx');
-  print_r($birkmanData);
+$birkmanData = $birkman->getUserCoreData('xx');
+print_r($birkmanData);
+
+$img = imagecreatefrompng(__DIR__ . '/birkman-img/lifestyle_grid_base.png');
+
