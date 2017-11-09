@@ -11,6 +11,7 @@
     ],
     "minimum-stability": "beta",
     "require" : {
+        "ext-gd": "*",
         "silex/silex": "^2.0.4",
         "monolog/monolog": "^1.22",
         "twig/twig": "^2.0",
