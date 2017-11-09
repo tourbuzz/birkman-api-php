@@ -1,6 +1,7 @@
 <?php
 
 require 'lib/BirkmanAPI.php';
+require 'lib/BirkmanGrid.php';
 
 $args = array_slice($argv, 1);
 if (count($args) !== 2)
@@ -16,5 +17,5 @@ $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
 $birkmanData = $birkman->getUserCoreData('xx');
 print_r($birkmanData);
 
-$img = imagecreatefrompng(__DIR__ . '/birkman-img/lifestyle_grid_base.png');
-
+$grid = new BirkmanGrid($birkmanData);
+$grid->asPNG('./grid.png');
