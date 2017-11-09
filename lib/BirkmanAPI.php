@@ -145,7 +145,8 @@ class BirkmanAPI
 
     public function getUserCoreData($userId)
     {
-        $xml = simplexml_load_string($this->getReportData($userId, 2402262));
+        $coreReportId = 2402262;    // not sure if this reportId is the same report for any Birkman account/catalog? pretty random ID number...
+        $xml = simplexml_load_string($this->getReportData($userId, $coreReportId));
         //$xml = simplexml_load_file(__DIR__ . '/../grid.out.xml');
 
         // register namespace
