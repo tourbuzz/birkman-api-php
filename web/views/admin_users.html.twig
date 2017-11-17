@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+<table class="table">
+    <tr>
+        <th>Birkman ID</th>
+        <th>Slack Username</th>
+        <th></th>
+    </tr>
+    {% for user in users %}
+        <tr>
+            <td>{{ user.birkman_id }}</td>
+            <td>{{ user.slack_username }}</td>
+            <td><form method="POST">
+                <button class="btn btn-danger" type="submit" name="delete" value="{{ user.birkman_id }}"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            </form></td>
+        </tr>
+    {% endfor %}
+        <form method="POST">
+        <tr>
+            <td><input placeholder="Birkman ID" type=text name="birkman_id" /></td>
+            <td><input placeholder="Slack Username" type="text" name="slack_username" /></td>
+            <td><button type="submit" class="btn btn-primary" name="insert">Add</button></td>
+        </tr>
+        </form>
+</table>
+</div>
+</div>
+{% endblock %}

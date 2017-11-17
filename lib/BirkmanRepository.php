@@ -66,4 +66,15 @@ class BirkmanRepository
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function delete(string $birkmanId)
+    {
+        $stmt = $this->conn->prepare('
+            DELETE FROM birkman_data
+            WHERE birkman_id = :birkman_id;
+        ');
+
+        $stmt->bindParam(':birkman_id', $birkmanId);
+        $stmt->execute();
+    }
 }

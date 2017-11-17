@@ -47,9 +47,26 @@ $app->get('/grid/{userId}', function(Silex\Application $silexApp, $userId) use($
   );
 });
 
-$app->get('/admin/users', function(Silex\Application $app) {
-  var_dump($app['birkman_repository']->fetchAll());
-  return '';
-});
+$app->match('/admin/users', function(Silex\Application $app, \Symfony\Component\HttpFoundation\Request $request) {
+    /** @var BirkmanRepository $birkmanRepository */
+    $birkmanRepository = $app['birkman_repository'];
+
+    $users = $birkmanRepository->fetchAll();
+
+    if ($request->getMethod() === 'POST') {
+        if ($request->request->has('insert')) {
+            $birkmanRepository->createUser(
+                $request->request->get('birkman_id'),
+                $request->request->get('slack_username')
+            );
+        } elseif ($request->request->has('delete')) {
+            $birkmanRepository->delete($request->request->get('birkman_id'));
+        }
+
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
+    }
+
+  return $app['twig']->render('admin_users.html.twig', ['users' => $users]);
+})->method('GET|POST');
 
 $app->run();
