@@ -50,7 +50,7 @@ class BirkmanRepository
     {
         $stmt = $this->conn->prepare('
             SELECT * FROM birkman_data WHERE slack_username = :slack_username LIMIT 1;
-        ')
+        ');
         $stmt->bindParam(':slack_username', $slackUsername);
         $stmt->execute();
 
