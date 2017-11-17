@@ -12,7 +12,7 @@ $app['base_dir'] = __DIR__.'/..';
 
 /** $app['conn'] \PDO */
 $app['conn'] = require $app['base_dir'].'/db/connection.php';
-$app['birkman_repository'] = new BirkmanRepository($app['conn']);
+$app['birkman_repository'] = new \BirkmanRepository($app['conn']);
 
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
@@ -45,6 +45,11 @@ $app->get('/grid/{userId}', function(Silex\Application $silexApp, $userId) use($
       200,
       ['Content-Type' => 'image/png']
   );
+});
+
+$app->get('/admin/users', function(Silex\Application $app) {
+  var_dump($app['birkman_repository']->fetchAll());
+  return '';
 });
 
 $app->run();

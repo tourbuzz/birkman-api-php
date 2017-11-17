@@ -5,7 +5,7 @@ class BirkmanRepository
     /** @var \PDO */
     protected $conn;
 
-    public function construct(\PDO $conn)
+    public function __construct(\PDO $conn)
     {
         $this->conn = $conn;
     }
