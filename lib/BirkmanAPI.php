@@ -1,5 +1,9 @@
 <?php
 
+use Amenadiel\JpGraph\Graph;
+use Amenadiel\JpGraph\Plot;
+use Amenadiel\JpGraph\Themes;
+
 class BirkmanAPI
 {
     protected $apiKey;
@@ -178,6 +182,66 @@ class BirkmanAPI
      */
     public function getAlastairsComparativeReport($userAId, $userBId)
     {
+        // construct graph
+        $components = [
+            'Social Energy',
+            'Physical Energy',
+            'Emotional Energy',
+            'Self-Consciousness',
+            'Assertiveness',
+            'Insistence',
+            'Incentives',
+            'Restlessness',
+            'Thought',
+        ];
+
+        $userAUsuals = array(10,20,30,40,50,60,70,80,90);
+		$userBNeeds = array(90,80,70,60,50,40,30,20,10);
+
+		// Setup the graph
+		$graph = new Graph\Graph(700,700);
+		$graph->SetScale("textlin");
+
+		$theme_class = new Themes\UniversalTheme;
+
+		$graph->SetTheme($theme_class);
+        $graph->xaxis->SetLabelAngle(90);
+        $graph->legend->SetPos(0.5,0.98,'center','bottom');
+		$graph->img->SetAntiAliasing(false);
+		$graph->title->Set("Alastair's Magic Birkman Graph");
+		$graph->SetBox(false);
+
+		$graph->img->SetAntiAliasing();
+
+		$graph->yaxis->HideZeroLabel();
+		$graph->yaxis->HideLine(false);
+		$graph->yaxis->HideTicks(false,false);
+
+		$graph->xgrid->Show();
+		$graph->xgrid->SetLineStyle("solid");
+		$graph->xaxis->SetTickLabels($components);
+		$graph->xgrid->SetColor('#E3E3E3');
+
+		// Create the first line
+		$p1 = new Plot\LinePlot($userAUsuals);
+		$graph->Add($p1);
+		$p1->SetColor("#6495ED");
+		$p1->SetLegend("{$userAId} Usual Behavior");
+
+		// Create the second line
+		$p2 = new Plot\LinePlot($userBNeeds);
+		$graph->Add($p2);
+		$p2->SetColor("#B22222");
+		$p2->SetLegend("{$userBId} Needs");
+
+		$graph->legend->SetFrameWeight(1);
+
+		// Output line
+        $tmpfile = tempnam(sys_get_temp_dir(), 'birkman_');
+		$graph->Stroke($tmpfile);
+        $ok = copy($tmpfile, __DIR__.'/../alastair-graph.png');
+        if (!$ok) throw new Exception("failed to copy");
+
         return [
             'graphImg' => file_get_contents(__DIR__ .'/../birkman-img/lifestyle_grid_base.png'),
             'criticalComponents' => [
