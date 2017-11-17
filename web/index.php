@@ -88,7 +88,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
     $userABirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserA);
     $userBBirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserB);
     $birkmanData = $birkman->getAlastairsComparativeReport($userABirkman['birkman_data'], $userBBirkman['birkman_data']);
-    print_r($birkmanData);
+    print_r($birkmanData['criticalComponents']);
     die();
 
     // tell slack we're all good
