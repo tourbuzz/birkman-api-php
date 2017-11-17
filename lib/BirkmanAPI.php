@@ -187,28 +187,17 @@ class BirkmanAPI
 
         // construct graph
         $components = [
-            'Social Energy',
-            'Physical Energy',
-            'Emotional Energy',
-            'Self-Consciousness',
-            'Assertiveness',
-            'Insistence',
-            'Incentives',
-            'Restlessness',
-            'Thought',
+            'acceptance' => 'Social Energy',
+            'activity'   => 'Physical Energy',
+            'advantage'  => 'Incentives',
+            'authority'  => 'Assertiveness',
+            'change'     => 'Restlessness',
+            'empathy'    => 'Emotional Energy',
+            'esteem'     => 'Self-Consciousness',
+            'structure'  => 'Insistence',
+            'thought'    => 'Thought',
         ];
-        $components = [
-            'acceptance',
-            'activity',
-            'advantage',
-            'authority',
-            'change',
-            'empathy',
-            'esteem',
-            'freedom',
-            'structure',
-            'thought',
-        ];
+        ksort($components);
 
         foreach ($userAData['components'] as $component => $value) {
             if (preg_match('/(.*)_usual/', $component, $matches)) {
@@ -217,12 +206,17 @@ class BirkmanAPI
                 $userAUsuals[$component] = $value;
             }
         }
+        ksort($userAUsuals);
+        print_r($userAUsuals);
         foreach ($userBData['components'] as $component => $value) {
             if (preg_match('/(.*)_need/', $component, $matches)) {
+                $component = $matches[1];
                 if ($component === 'freedom') continue;
                 $userBNeeds[$component] = $value;
             }
         }
+        ksort($userBNeeds);
+        print_r($userBNeeds);
 
 		// Setup the graph
 		$graph = new Graph\Graph(700,700);
@@ -245,20 +239,20 @@ class BirkmanAPI
 
 		$graph->xgrid->Show();
 		$graph->xgrid->SetLineStyle("solid");
-		$graph->xaxis->SetTickLabels(array_keys($userAUsuals));
+		$graph->xaxis->SetTickLabels(array_values($components));
 		$graph->xgrid->SetColor('#E3E3E3');
 
 		// Create the first line
 		$p1 = new Plot\LinePlot(array_values($userAUsuals));
 		$graph->Add($p1);
 		$p1->SetColor("#6495ED");
-		$p1->SetLegend("{$userAId} Usual Behavior");
+		$p1->SetLegend("{$userAData['name']} Usual Behavior");
 
 		// Create the second line
 		$p2 = new Plot\LinePlot(array_values($userBNeeds));
 		$graph->Add($p2);
 		$p2->SetColor("#B22222");
-		$p2->SetLegend("{$userBId} Needs");
+		$p2->SetLegend("{$userBData['name']} Needs");
 
 		$graph->legend->SetFrameWeight(1);
 

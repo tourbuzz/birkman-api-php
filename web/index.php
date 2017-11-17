@@ -1,11 +1,9 @@
 <?php
 
+require('../vendor/autoload.php');
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-
-require('../vendor/autoload.php');
-require('../lib/BirkmanAPI.php');
-require('../lib/BirkmanGrid.php');
 
 $app = new Silex\Application();
 $app['debug'] = true;
@@ -44,9 +42,9 @@ $app->get('/grid/', function(Request $request) use($app) {
   $userId = $request->query->get('text');
 
   // build birkman grid
-  $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+  $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
   $birkmanData = $birkman->getUserCoreData($userId);
-  $grid = new BirkmanGrid($birkmanData);
+  $grid = new \BirkmanGrid($birkmanData);
   ob_start();
   $grid->asPNG();
   $imageData = ob_get_contents();
@@ -60,11 +58,12 @@ $app->get('/grid/', function(Request $request) use($app) {
   );
 });
 
-
 $app->get('/slack-slash-command/', function(Request $request) use($app) {
   $app['monolog']->addDebug('Requested Birkman GRID');
+  $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
 
   $slackToken = $request->query->get('token');
+
   if ($slackToken !== getenv('SLACK_TOKEN')) {
       $app->abort(403, "token does not match app's configured SLACK_TOKEN");
   }
@@ -73,23 +72,38 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
   // /birkman GTW013 sjhdf skdfjh
   // text=GTW013 sjhdf skdfjh
   $command = $request->query->get('text');
-  $birkmanRepository = $app['birkman_repository'];
-  $userA = $birkmanRepository->fetchBySlackUsername('alan.pinstein');
-  $userB = $birkmanRepository->fetchBySlackUsername('alan.melling');
+  // Clean up command
+  $command = preg_replace('/\s+/', ' ', $command);
+  $parts = explode(' ', $command);
 
-  // build birkman grid
-  $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
-  $birkmanData = $birkman->getAlastairsComparativeReport($userA['birkman_data'], $userB['birkman_data']);
+  // Expects slack username A and slack username B.
+  if (count($parts) != 2) {
+    throw new \Exception("Expected exactly two command args got " . count($parts));
+  }
+  $slackUserA = $request->query->get('user_name');
+  $slackUserB = trim($parts[1], '@');
 
-  print_r($birkmanData);
+  // Translate slack username to birkman user ids
+  try {
+    $userABirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserA);
+    $userBBirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserB);
+    $birkmanData = $birkman->getAlastairsComparativeReport($userABirkman['birkman_data'], $userBBirkman['birkman_data']);
 
-  // send responses
-
-  // tell slack we're all good
-  return new Response(
-      'OK',
-      200
-  );
+    // tell slack we're all good
+    return new Response(
+        'OK',
+        Response::HTTP_OK
+    );
+  } catch (\RecordNotFoundException $e) {
+    $app['monolog']->addDebug($e->getMessage());
+    // Return a response instead of blowing up.
+    // Users entering wrong or no longer valid slack usernames is sometimes expected.
+    // Also keep in mind at this point the request is trusted (via slack token).
+    return new Response(
+        $e->getMessage(),
+        Response::HTTP_NOT_FOUND
+    );
+  }
 });
 
 $app->match('/admin/users', function(Silex\Application $app, \Symfony\Component\HttpFoundation\Request $request) {
