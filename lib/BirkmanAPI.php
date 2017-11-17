@@ -246,12 +246,16 @@ class BirkmanAPI
 		$p1 = new Plot\LinePlot(array_values($userAUsuals));
 		$graph->Add($p1);
 		$p1->SetColor("#6495ED");
+        $p1->mark->SetType(MARK_FILLEDCIRCLE, '', 1);
+        $p1->mark->SetFillColor('#6495ED');
 		$p1->SetLegend("{$userAData['name']} Usual Behavior");
 
 		// Create the second line
 		$p2 = new Plot\LinePlot(array_values($userBNeeds));
 		$graph->Add($p2);
 		$p2->SetColor("#B22222");
+        $p2->mark->SetType(MARK_FILLEDCIRCLE, '', 1);
+        $p2->mark->SetFillColor('#B22222');
 		$p2->SetLegend("{$userBData['name']} Needs");
 
 		$graph->legend->SetFrameWeight(1);
