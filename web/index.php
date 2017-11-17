@@ -11,6 +11,11 @@ use Repository\RecordNotFoundException;
 
 $app = new Silex\Application();
 $app['debug'] = true;
+$app['base_dir'] = __DIR__.'/..';
+
+/** $app['conn'] \PDO */
+$app['conn'] = require $app['base_dir'].'/db/connection.php';
+$app['birkman_repository'] = new \BirkmanRepository($app['conn']);
 
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
@@ -113,5 +118,27 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
       Response::HTTP_OK
   );
 });
+
+$app->match('/admin/users', function(Silex\Application $app, \Symfony\Component\HttpFoundation\Request $request) {
+    /** @var BirkmanRepository $birkmanRepository */
+    $birkmanRepository = $app['birkman_repository'];
+
+    $users = $birkmanRepository->fetchAll();
+
+    if ($request->getMethod() === 'POST') {
+        if ($request->request->has('insert')) {
+            $birkmanRepository->createUser(
+                $request->request->get('birkman_id'),
+                $request->request->get('slack_username')
+            );
+        } elseif ($request->request->has('delete')) {
+            $birkmanRepository->delete($request->request->get('birkman_id'));
+        }
+
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
+    }
+
+  return $app['twig']->render('admin_users.html.twig', ['users' => $users]);
+})->method('GET|POST');
 
 $app->run();

@@ -3,16 +3,15 @@
     "description": "API wrapper for the Birkman Assessment",
     "homepage": "https://github.com/tourbuzz/birkman-api-php",
     "license": "MIT",
-    "autoload": {
-        "psr-4": {"": "lib/"}
-    },
     "authors": [
         {
             "name": "Alan Pinstein",
             "email": "apinstein@mac.com"
         }
     ],
-    "minimum-stability": "beta",
+    "autoload": {
+        "psr-4": {"": "lib/"}
+    },
     "require" : {
         "ext-gd": "*",
         "silex/silex": "^2.0.4",
