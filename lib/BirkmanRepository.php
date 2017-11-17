@@ -2,13 +2,18 @@
 
 class BirkmanRepository
 {
-    proteted $conn;
+    /** @var \PDO */
+    protected $conn;
 
     public function construct(\PDO $conn)
     {
         $this->conn = $conn;
     }
 
+    /**
+     * @param string $birkmanId
+     * @param string $slackUsername
+     */
     public function createUser(string $birkmanId, string $slackUsername)
     {
         $stmt = $this->conn->prepare('
@@ -21,6 +26,10 @@ class BirkmanRepository
         $stmt->execute();
     }
 
+    /**
+     * @param string $birkmanId
+     * @param string $birkmanJsonData
+     */
     public function updateBirkmanData(string $birkmanId, string $birkmanJsonData)
     {
         $stmt = $this->conn->prepare('
@@ -31,5 +40,20 @@ class BirkmanRepository
         $stmt->bindParam(':birkman_id', $birkmanId);
         $stmt->bindParam(':birkman_data', $birkmanJsonData);
         $stmt->execute();
+    }
+
+    /**
+     * @param string $slackUsername
+     * @return false|array
+     */
+    public function fetchBySlackUsername(string $slackUsername)
+    {
+        $stmt = $this->conn->prepare('
+            SELECT * FROM birkman_data WHERE slack_username = :slack_username LIMIT 1;
+        ')
+        $stmt->bindParam(':slack_username', $slackUsername);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
