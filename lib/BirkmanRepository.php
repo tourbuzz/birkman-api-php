@@ -45,6 +45,7 @@ class BirkmanRepository
     /**
      * @param string $slackUsername
      * @return false|array
+     * @throws RecordNotFoundException
      */
     public function fetchBySlackUsername(string $slackUsername)
     {
@@ -54,7 +55,13 @@ class BirkmanRepository
         $stmt->bindParam(':slack_username', $slackUsername);
         $stmt->execute();
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $record = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$record) {
+            throw new \RecordNotFoundException("Record not found by slack username " . $slackUsername);
+        }
+
+        return $record;
     }
 
     public function fetchAll()

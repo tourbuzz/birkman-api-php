@@ -1,13 +1,9 @@
 <?php
 
 require('../vendor/autoload.php');
-require('../lib/BirkmanAPI.php');
-require('../lib/BirkmanGrid.php');
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Repository\RepositoryStub;
-use Repository\RecordNotFoundException;
 
 $app = new Silex\Application();
 $app['debug'] = true;
@@ -46,9 +42,9 @@ $app->get('/grid/', function(Request $request) use($app) {
   $userId = $request->query->get('text');
 
   // build birkman grid
-  $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+  $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
   $birkmanData = $birkman->getUserCoreData($userId);
-  $grid = new BirkmanGrid($birkmanData);
+  $grid = new \BirkmanGrid($birkmanData);
   ob_start();
   $grid->asPNG();
   $imageData = ob_get_contents();
@@ -87,25 +83,24 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
   $slackUserB = $parts[1];
 
   // Translate slack username to birkman user ids
-  $repository = new RepositoryStub();
-
   try {
-    $userABirkmanId = $repository->findBirkmanUserIdBySlackUsername($slackUserA);
-    $userBBirkmanId = $repository->findBirkmanUserIdBySlackUsername($slackUserB);
-  } catch (RecordNotFoundException $e) {
+    $userABirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserA);
+    $userBBirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserB);
+    $userABirkmanId = $userABirkman['birkman_id'];
+    $userBBirkmanId = $userBBirkman['birkman_id'];
+  } catch (\RecordNotFoundException $e) {
     $app['monolog']->addDebug($e->getMessage());
-
     // Return a response instead of blowing up.
-    // Users entering wrong or no longer valid slack usernames is expected.
-    // Keep in mind at this point the request is trusted (via slack token).
+    // Users entering wrong or no longer valid slack usernames is sometimes expected.
+    // Also keep in mind at this point the request is trusted (via slack token).
     return new Response(
-      $e->getMessage(),
-      Response::HTTP_NOT_FOUND
+        $e->getMessage(),
+        Response::HTTP_NOT_FOUND
     );
   }
 
   // build birkman grid
-  $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+  $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
   $birkmanData = $birkman->getAlastairsComparativeReport($userABirkmanId, $userBBirkmanId);
 
   print_r($birkmanData);
