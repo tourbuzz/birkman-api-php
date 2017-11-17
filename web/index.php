@@ -9,6 +9,11 @@ require('../lib/BirkmanGrid.php');
 
 $app = new Silex\Application();
 $app['debug'] = true;
+$app['base_dir'] = __DIR__.'/..';
+
+/** $app['conn'] \PDO */
+$app['conn'] = require $app['base_dir'].'/db/connection.php';
+$app['birkman_repository'] = new \BirkmanRepository($app['conn']);
 
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
@@ -55,6 +60,7 @@ $app->get('/grid/', function(Request $request) use($app) {
   );
 });
 
+
 $app->get('/slack-slash-command/', function(Request $request) use($app) {
   $app['monolog']->addDebug('Requested Birkman GRID');
 
@@ -67,14 +73,13 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
   // /birkman GTW013 sjhdf skdfjh
   // text=GTW013 sjhdf skdfjh
   $command = $request->query->get('text');
-  $userA = 'foo';
-  $userB = 'bar';
-  $userABirkmanId = '123456';
-  $userBBirkmanId = '654321';
+  $birkmanRepository = $app['birkman_repository'];
+  $userA = $birkmanRepository->fetchBySlackUsername('alan.pinstein');
+  $userB = $birkmanRepository->fetchBySlackUsername('alan.melling');
 
   // build birkman grid
   $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
-  $birkmanData = $birkman->getAlastairsComparativeReport($userABirkmanId, $userBBirkmanId);
+  $birkmanData = $birkman->getAlastairsComparativeReport($userA['birkman_data'], $userB['birkman_data']);
 
   print_r($birkmanData);
 
@@ -86,5 +91,34 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
       200
   );
 });
+
+$app->match('/admin/users', function(Silex\Application $app, \Symfony\Component\HttpFoundation\Request $request) {
+    /** @var BirkmanRepository $birkmanRepository */
+    $birkmanRepository = $app['birkman_repository'];
+
+    $users = $birkmanRepository->fetchAll();
+
+    // HACK to update all birkman datas...
+    $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+    foreach ($users as $user) {
+        $birkmanData = $birkman->getUserCoreData($user['birkman_id']);
+        $birkmanRepository->updateBirkmanData($user['birkman_id'], json_encode($birkmanData));
+    }
+
+    if ($request->getMethod() === 'POST') {
+        if ($request->request->has('insert')) {
+            $birkmanRepository->createUser(
+                $request->request->get('birkman_id'),
+                $request->request->get('slack_username')
+            );
+        } elseif ($request->request->has('delete')) {
+            $birkmanRepository->delete($request->request->get('birkman_id'));
+        }
+
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
+    }
+
+  return $app['twig']->render('admin_users.html.twig', ['users' => $users]);
+})->method('GET|POST');
 
 $app->run();

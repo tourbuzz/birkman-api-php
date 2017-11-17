@@ -180,8 +180,11 @@ class BirkmanAPI
     /**
      * User A talks to user B... what's important to know?
      */
-    public function getAlastairsComparativeReport($userAId, $userBId)
+    public function getAlastairsComparativeReport($userAData, $userBData)
     {
+        $userAData = json_decode($userAData, true);
+        $userBData = json_decode($userBData, true);
+
         // construct graph
         $components = [
             'Social Energy',
@@ -194,9 +197,32 @@ class BirkmanAPI
             'Restlessness',
             'Thought',
         ];
+        $components = [
+            'acceptance',
+            'activity',
+            'advantage',
+            'authority',
+            'change',
+            'empathy',
+            'esteem',
+            'freedom',
+            'structure',
+            'thought',
+        ];
 
-        $userAUsuals = array(10,20,30,40,50,60,70,80,90);
-		$userBNeeds = array(90,80,70,60,50,40,30,20,10);
+        foreach ($userAData['components'] as $component => $value) {
+            if (preg_match('/(.*)_usual/', $component, $matches)) {
+                $component = $matches[1];
+                if ($component === 'freedom') continue;
+                $userAUsuals[$component] = $value;
+            }
+        }
+        foreach ($userBData['components'] as $component => $value) {
+            if (preg_match('/(.*)_need/', $component, $matches)) {
+                if ($component === 'freedom') continue;
+                $userBNeeds[$component] = $value;
+            }
+        }
 
 		// Setup the graph
 		$graph = new Graph\Graph(700,700);
@@ -219,17 +245,17 @@ class BirkmanAPI
 
 		$graph->xgrid->Show();
 		$graph->xgrid->SetLineStyle("solid");
-		$graph->xaxis->SetTickLabels($components);
+		$graph->xaxis->SetTickLabels(array_keys($userAUsuals));
 		$graph->xgrid->SetColor('#E3E3E3');
 
 		// Create the first line
-		$p1 = new Plot\LinePlot($userAUsuals);
+		$p1 = new Plot\LinePlot(array_values($userAUsuals));
 		$graph->Add($p1);
 		$p1->SetColor("#6495ED");
 		$p1->SetLegend("{$userAId} Usual Behavior");
 
 		// Create the second line
-		$p2 = new Plot\LinePlot($userBNeeds);
+		$p2 = new Plot\LinePlot(array_values($userBNeeds));
 		$graph->Add($p2);
 		$p2->SetColor("#B22222");
 		$p2->SetLegend("{$userBId} Needs");

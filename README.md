@@ -35,7 +35,9 @@ $ heroku open
 
 or
 
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://www.heroku.com/deploy?template=https://github.com/tourbuzz/birkman-api-php/blob/master)
+
+Once deployed you will need to goto the settings page and add ENV Variables for `BIRKMAN_API_KEY` and `SLACK_TOKEN`
 
 ## Documentation
 
