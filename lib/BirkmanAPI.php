@@ -177,28 +177,31 @@ class BirkmanAPI
       return $birkmanData;
     }
 
+    private function getComponentVerbiage()
+    {
+        $json = file_get_contents(__DIR__ . '/../lib/component-verbiage.json');
+        if ($json === false) {
+            throw new Exception("couldn't load component-verbiage.json");
+        }
+        $components = json_decode($json, true);
+        if ($components === NULL) {
+            throw new Exception("couldn't parse component-verbiage.json");
+        }
+        ksort($components);
+        return $components;
+    }
+
     /**
      * User A talks to user B... what's important to know?
      */
     public function getAlastairsComparativeReport($userAData, $userBData)
     {
+        $components = $this->getComponentVerbiage();
+
         $userAData = json_decode($userAData, true);
         $userBData = json_decode($userBData, true);
 
-        // construct graph
-        $components = [
-            'acceptance' => 'Social Energy',
-            'activity'   => 'Physical Energy',
-            'advantage'  => 'Incentives',
-            'authority'  => 'Assertiveness',
-            'change'     => 'Restlessness',
-            'empathy'    => 'Emotional Energy',
-            'esteem'     => 'Self-Consciousness',
-            'structure'  => 'Insistence',
-            'thought'    => 'Thought',
-        ];
-        ksort($components);
-
+        // organize data for graph -- userA usuals vs userB needs
         foreach ($userAData['components'] as $component => $value) {
             if (preg_match('/(.*)_usual/', $component, $matches)) {
                 $component = $matches[1];
@@ -206,8 +209,8 @@ class BirkmanAPI
                 $userAUsuals[$component] = $value;
             }
         }
-        ksort($userAUsuals);
-        print_r($userAUsuals);
+        ksort($userAUsuals); // sort by component to align data
+
         foreach ($userBData['components'] as $component => $value) {
             if (preg_match('/(.*)_need/', $component, $matches)) {
                 $component = $matches[1];
@@ -215,8 +218,7 @@ class BirkmanAPI
                 $userBNeeds[$component] = $value;
             }
         }
-        ksort($userBNeeds);
-        print_r($userBNeeds);
+        ksort($userBNeeds); // sort by component to align data
 
 		// Setup the graph
 		$graph = new Graph\Graph(700,700);
@@ -239,7 +241,8 @@ class BirkmanAPI
 
 		$graph->xgrid->Show();
 		$graph->xgrid->SetLineStyle("solid");
-		$graph->xaxis->SetTickLabels(array_values($components));
+        $componentLabels = array_values(array_map(function($component) { return $component['label']; }, $components));
+		$graph->xaxis->SetTickLabels($componentLabels);
 		$graph->xgrid->SetColor('#E3E3E3');
 
 		// Create the first line
@@ -260,21 +263,35 @@ class BirkmanAPI
 
 		$graph->legend->SetFrameWeight(1);
 
-		// Output line
-        $tmpfile = tempnam(sys_get_temp_dir(), 'birkman_');
+		// Render graph to file
+        $tmpfile = tempnam(sys_get_temp_dir(), 'birkman_'); // @todo move to tempalicious so it cleans up for free -- right now this leaves trash
 		$graph->Stroke($tmpfile);
+        // @todo REMOVE TEMP for testing...
         $ok = copy($tmpfile, __DIR__.'/../alastair-graph.png');
         if (!$ok) throw new Exception("failed to copy");
+        // END temp
+
+        // find components with major diff's between a.usual and b.need
+        $criticalComponents = array_values(array_filter(array_keys($components), function($component) use ($userAData, $userBData, $components) {
+            $componentDiff = abs($userAData["components"]["{$component}_usual"] - $userBData["components"]["{$component}_need"]);
+            if ($componentDiff >= 20) {
+                return true;
+            }
+            return false;
+        }));
+        $highlights = [];
+        foreach ($criticalComponents as $component) {
+            $userAUsualRange = $userAData["components"]["{$component}_usual"] >= 50 ? 'high' : 'low';
+            $userBNeedRange = $userBData["components"]["{$component}_need"] >= 50 ? 'high' : 'low';
+            $highlights[$component] = [
+                'yourUsualExplanation' => $components[$component]['usual'][$userAUsualRange],
+                'theirNeedExplanation' => $components[$component]['need'][$userBNeedRange]
+            ];
+        }
 
         return [
-            'graphImg' => file_get_contents(__DIR__ .'/../birkman-img/lifestyle_grid_base.png'),
-            'criticalComponents' => [
-                [
-                    'componentName'             => 'Esteem',
-                    'yourUsualExplanation'      => 'You usually do X...',
-                    'theirNeedExplanation'      => 'They need Y...'
-                ],
-            ]
+            'graphImg' => file_get_contents($tmpfile),
+            'criticalComponents' => $highlights
         ];
     }
 }

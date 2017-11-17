@@ -18,7 +18,8 @@
         "monolog/monolog": "^1.22",
         "twig/twig": "^2.0",
         "symfony/twig-bridge": "^3",
-        "amenadiel/jpgraph": "^3.6"
+        "amenadiel/jpgraph": "^3.6",
+        "tourbuzz/tempalicious": "^0.1.0"
     },
     "require-dev": {
         "heroku/heroku-buildpack-php": "*"

@@ -1,0 +1,102 @@
+{
+    "acceptance": {
+        "description": "Sociability, approachability, and preference for group and team participation",
+        "label": "Social Energy",
+        "usual": {
+            "low": "The lower someone's Social Energy usual behavior, the more often that person will be independent, able to work well alone, communicate one-on-one, and be selectively sociable.",
+            "high": "The higher someone's Social Energy usual behavior, the more often that person will encourage group and team efforts, be socially at ease, and be friendly and easy to know."
+        },
+        "need": {
+            "low": "The lower someone's Social Energy needs, the more that person will need opportunities to be and work alone, freedom from social demands, and plenty of time alone or in small groups.",
+            "high": "The higher someone's Social Energy needs, the more often that person will need support from groups, casual interactions, a broad social group, and to feel part of the group."
+        }
+    },
+    "activity": {
+        "label": "Physical Energy",
+        "usual": {
+            "low": "The lower someone’s Physical Energy usual behavior, the more often that person will be efficient in using energies, balance action with thought, and will like to reflect before acting.",
+            "high": "The higher someone’s Physical Energy usual behavior, the more often that person will be physically active and industrious, respond immediately and vigorously, and take direct action to get things done."
+        },
+        "need": {
+            "low": "The lower someone’s Physical Energy needs, the more that person will need freedom to set their own pace, time for quiet reflection and stimulation of ideas, and personal control over scheduling.",
+            "high": "The higher someone’s Physical Energy needs, the more that person will need opportunities for varied physical action, social outlets for energy, and a busy schedule."
+        }
+    },
+    "advantage": {
+        "label": "Incentives",
+        "usual": {
+            "low": "The lower someone’s Incentives usual behavior, the more often that person will be trustful and team-spirited, aware of long-term benefits, value intangibles, and be oriented towards general benefit.",
+            "high": "The higher someone’s Incentives usual behavior, the more often that person will be opportunity minded, resourceful, naturally bargain, sell, trade, and be oriented toward individual advantage."
+        },
+        "need": {
+            "low": "The lower someone’s Incentives needs, the more that person will need a minimum of competitive rivalry, a trustful, serving environment, and an environment based on trust.",
+            "high": "The higher someone’s Incentives needs, the more that person will need opportunities to compete, tangible benefits, and a means of measuring personal performance."
+        }
+    },
+    "authority": {
+        "label": "Assertiveness",
+        "usual": {
+            "low": "The lower someone’s Assertiveness usual behavior, the more often that person will be suggestive, deferent and agreeable, democratic, and low-key in the exercise of authority.",
+            "high": "The higher someone’s Assertiveness usual behavior, the more often that person will seek to influence and convince, be self-assertive, express differences of opinion, and be directive and commanding."
+        },
+        "need": {
+            "low": "The lower someone’s Assertiveness needs, the more that person will need agreeable relationships, autonomy, a suggesting style from others, and a non-directive, democratic environment.",
+            "high": "The higher someone’s Assertiveness needs, the more that person will need clarity of accountability, defined lines of authority, opportunities to discuss and debate, and to know who is in charge."
+        }
+    },
+    "change": {
+        "label": "Restlessness",
+        "usual": {
+            "low": "The lower someone’s Restlessness usual behavior, the more often that person will be concentrative, not easily distracted, patient with long-range projects, and will concentrate attentions well.",
+            "high": "The higher someone’s Restlessness usual behavior, the more often that person will be ready to start new things, easy to stimulate, responsive and attentive, and will like a variety of simultaneous tasks."
+        },
+        "need": {
+            "low": "The lower someone’s Restlessness needs, the more that person will need opportunity for input before changes are initiated, a minimum of abrupt changes, and adequate notice of any change.",
+            "high": "The higher someone’s Restlessness needs, the more that person will need alternating work responsibilities, opportunities to shift priorities when new interests arise, and plenty of different calls on attention."
+        }
+    },
+    "empathy": {
+        "label": "Emotional Energy",
+        "usual": {
+            "low": "The lower someone’s Emotional Energy usual behavior, the more often that person will be objective, provide perspective, focus on solutions, and be objective and detached.",
+            "high": "The higher someone’s Emotional Energy usual behavior, the more often that person will express warm feelings, emphasize values and intangibles, be intuitive, and be sympathetic and warm."
+        },
+        "need": {
+            "low": "The lower someone’s Emotional Energy needs, the more that person will need logical solutions to problems, detached and matter-of-fact interactions, and objective sounding board, and an unemotional environment.",
+            "high": "The higher someone’s Emotional Energy needs, the more that person will need and ongoing outlet for subjective feelings, opportunities to confide inner feelings, and an outlet for subjective issues."
+        }
+    },
+    "esteem": {
+        "label": "Self-Consciousness",
+        "usual": {
+            "low": "The lower someone’s Self-Consciousness usual behavior, the more often that person will be candid, be direct and straightforward, be at ease, and focus on tasks.",
+            "high": "The higher someone’s Self-Consciousness usual behavior, the more often that person will value diplomacy, focus on self and others, and be insightful and intuitive."
+        },
+        "need": {
+            "low": "The lower someone’s Self-Consciousness needs, the more that person will need frank and direct relationships, candor, and for others to be frank and forthright.",
+            "high": "The higher someone’s Self-Consciousness needs, the more that person will need respect, focus from significant individuals, and respect of key individuals."
+        }
+    },
+    "structure": {
+        "label": "Insistence",
+        "usual": {
+            "low": "The lower someone’s Insistence usual behavior, the more often that person will act on personal initiative, make simple broad plans, and be flexible and open to new .approaches.",
+            "high": "The higher someone’s Insistence usual behavior, the more often that person will be meticulous in planning and detail, operate on carefully calculated risks, and be organized and sequential."
+        },
+        "need": {
+            "low": "The lower someone’s Insistence needs, the more that person will need freedom from close control, minimal routine, easy access to others, and only an outline plan to follow.",
+            "high": "The higher someone’s Insistence needs, the more that person will need defined systems and procedures, predictability, organizational support, and a definite plan in place."
+        }
+    },
+    "thought": {
+        "label": "Thought",
+        "usual": {
+            "low": "The lower someone’s Thought usual behavior, the more often that person will be decisive, matter-of-fact in thought and action, grasp situations quickly, and see issues in terms of black and white.",
+            "high": "The higher someone’s Thought usual behavior, the more often that person will be thoughtful and reflective, think before acting, weigh both sides of issues, and handle ambiguous situations well."
+        },
+        "need": {
+            "low": "The lower someone’s Thought needs, the more that person will need work and decisions that involve little ambiguity, freedom to take immediate action, and issues reduced to their simplest form.",
+            "high": "The higher someone’s Thought needs, the more that person will need ample time to think carefully and to consider options and implications, and plenty of time for complex decisions."
+        }
+    }
+}
