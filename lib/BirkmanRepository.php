@@ -56,4 +56,14 @@ class BirkmanRepository
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function fetchAll()
+    {
+        $stmt = $this->conn->prepare('
+            SELECT * FROM birkman_data;
+        ');
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

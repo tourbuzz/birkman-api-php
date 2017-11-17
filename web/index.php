@@ -12,7 +12,7 @@ $app['base_dir'] = __DIR__.'/..';
 
 /** $app['conn'] \PDO */
 $app['conn'] = require $app['base_dir'].'/db/connection.php';
-$app['birkman_loader'] = new BirkmanLoader($app['conn']);
+$app['birkman_repository'] = new BirkmanRepository($app['conn']);
 
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
