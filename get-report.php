@@ -3,6 +3,9 @@
 require 'lib/BirkmanAPI.php';
 require 'lib/BirkmanGrid.php';
 
+
+
+
 $args = array_slice($argv, 1);
 if (count($args) !== 2)
 {
@@ -14,7 +17,7 @@ list($userId, $reportId) = $args;
 
 $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
 //$report = $birkman->getReportData($userId, $reportId);
-$birkmanData = $birkman->getUserCoreData('xx');
+$birkmanData = $birkman->getUserCoreData($userId);
 print_r($birkmanData);
 
 $grid = new BirkmanGrid($birkmanData);

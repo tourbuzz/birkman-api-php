@@ -53,6 +53,13 @@ $app->match('/admin/users', function(Silex\Application $app, \Symfony\Component\
 
     $users = $birkmanRepository->fetchAll();
 
+    // HACK to update all birkman datas...
+    $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+    foreach ($users as $user) {
+        $birkmanData = $birkman->getUserCoreData($user['birkman_id']);
+        $birkmanRepository->updateBirkmanData($user['birkman_id'], json_encode($birkmanData));
+    }
+
     if ($request->getMethod() === 'POST') {
         if ($request->request->has('insert')) {
             $birkmanRepository->createUser(

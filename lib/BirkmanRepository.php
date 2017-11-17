@@ -33,7 +33,7 @@ class BirkmanRepository
     public function updateBirkmanData(string $birkmanId, string $birkmanJsonData)
     {
         $stmt = $this->conn->prepare('
-            UPDATE birkman_data SET (birkman_data = :birkman_data)
+            UPDATE birkman_data SET birkman_data = :birkman_data
             WHERE birkman_id = :birkman_id;
         ');
 
