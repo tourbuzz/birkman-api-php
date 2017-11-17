@@ -34,6 +34,8 @@ $app->get('/grid/', function(Request $request) use($app) {
   }
 
   // look up "birkman id" from slack profile
+  // /birkman GTW013 sjhdf skdfjh
+  // text=GTW013 sjhdf skdfjh
   $userId = $request->query->get('text');
 
   // build birkman grid
