@@ -9,7 +9,9 @@
             "email": "apinstein@mac.com"
         }
     ],
-    "minimum-stability": "beta",
+    "autoload": {
+        "classmap": ["lib/"]
+    },
     "require" : {
         "ext-gd": "*",
         "silex/silex": "^2.0.4",
