@@ -95,7 +95,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
     // Keep in mind at this point the request is trusted (via slack token).
     return new Response(
       $e->getMessage(),
-      Response::HTTP_BAD_REQUEST
+      Response::HTTP_NOT_FOUND
     );
   }
 

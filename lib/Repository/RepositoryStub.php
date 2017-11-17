@@ -12,6 +12,7 @@ class RepositoryStub
     public function findBirkmanUserIdBySlackUsername($slackUsername)
     {
         return substr(md5($slackUsername), 0, 5);
-        // if no record found throw new RecordNotFoundException("Record not found. Slack username " . $slackUsername);
+        // if no record found:
+        // throw new RecordNotFoundException("Record not found for slack username " . $slackUsername);
     }
 }

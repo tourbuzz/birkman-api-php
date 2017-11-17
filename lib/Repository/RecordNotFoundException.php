@@ -2,7 +2,7 @@
 
 namespace Repository;
 
-class RecordNotFoundException
+class RecordNotFoundException extends \Exception
 {
     protected $message = "record not found";
 }
