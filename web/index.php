@@ -55,4 +55,36 @@ $app->get('/grid/', function(Request $request) use($app) {
   );
 });
 
+$app->get('/slack-slash-command/', function(Request $request) use($app) {
+  $app['monolog']->addDebug('Requested Birkman GRID');
+
+  $slackToken = $request->query->get('token');
+  if ($slackToken !== getenv('SLACK_TOKEN')) {
+      $app->abort(403, "token does not match app's configured SLACK_TOKEN");
+  }
+
+  // look up "birkman id" from slack profile
+  // /birkman GTW013 sjhdf skdfjh
+  // text=GTW013 sjhdf skdfjh
+  $command = $request->query->get('text');
+  $userA = 'foo';
+  $userB = 'bar';
+  $userABirkmanId = '123456';
+  $userBBirkmanId = '654321';
+
+  // build birkman grid
+  $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+  $birkmanData = $birkman->getAlastairsComparativeReport($userABirkmanId, $userBBirkmanId);
+
+  print_r($birkmanData);
+
+  // send responses
+
+  // tell slack we're all good
+  return new Response(
+      'OK',
+      200
+  );
+});
+
 $app->run();

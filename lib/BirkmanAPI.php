@@ -172,4 +172,21 @@ class BirkmanAPI
 
       return $birkmanData;
     }
+
+    /**
+     * User A talks to user B... what's important to know?
+     */
+    public function getAlastairsComparativeReport($userAId, $userBId)
+    {
+        return [
+            'graphImg' => file_get_contents(__DIR__ .'/../birkman-img/lifestyle_grid_base.png'),
+            'criticalComponents' => [
+                [
+                    'componentName'             => 'Esteem',
+                    'yourUsualExplanation'      => 'You usually do X...',
+                    'theirNeedExplanation'      => 'They need Y...'
+                ],
+            ]
+        ];
+    }
 }
