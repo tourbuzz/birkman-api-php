@@ -1,7 +1,7 @@
 {
-  "name": "Start on Heroku: PHP",
-  "description": "A barebones PHP app that makes use of the Silex web framework",
-  "repository": "https://github.com/heroku/php-getting-started",
+  "name": "Birkman Buddy",
+  "description": "Birkman slack slash command webhook receiver",
+  "repository": "https://github.com/tourbuzz/birkman-api-php",
   "addons": [
     {
       "plan": "heroku-postgresql",
