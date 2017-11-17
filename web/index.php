@@ -1,11 +1,13 @@
 <?php
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-
 require('../vendor/autoload.php');
 require('../lib/BirkmanAPI.php');
 require('../lib/BirkmanGrid.php');
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Repository\RepositoryStub;
+use Repository\RecordNotFoundException;
 
 $app = new Silex\Application();
 $app['debug'] = true;
@@ -59,6 +61,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
   $app['monolog']->addDebug('Requested Birkman GRID');
 
   $slackToken = $request->query->get('token');
+
   if ($slackToken !== getenv('SLACK_TOKEN')) {
       $app->abort(403, "token does not match app's configured SLACK_TOKEN");
   }
@@ -67,10 +70,34 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
   // /birkman GTW013 sjhdf skdfjh
   // text=GTW013 sjhdf skdfjh
   $command = $request->query->get('text');
-  $userA = 'foo';
-  $userB = 'bar';
-  $userABirkmanId = '123456';
-  $userBBirkmanId = '654321';
+  // Clean up command
+  $command = preg_replace('/\s+/', ' ', $command);
+  $parts = explode(' ', $command);
+
+  // Expects slack username A and slack username B.
+  if (count($parts) != 2) {
+    throw new \Exception("Expected exactly two command args got " . count($parts));
+  }
+  $slackUserA = $parts[0];
+  $slackUserB = $parts[1];
+
+  // Translate slack username to birkman user ids
+  $repository = new RepositoryStub();
+
+  try {
+    $userABirkmanId = $repository->findBirkmanUserIdBySlackUsername($slackUserA);
+    $userBBirkmanId = $repository->findBirkmanUserIdBySlackUsername($slackUserB);
+  } catch (RecordNotFoundException $e) {
+    $app['monolog']->addDebug($e->getMessage());
+
+    // Return a response instead of blowing up.
+    // Users entering wrong or no longer valid slack usernames is expected.
+    // Keep in mind at this point the request is trusted (via slack token).
+    return new Response(
+      $e->getMessage(),
+      Response::HTTP_BAD_REQUEST
+    );
+  }
 
   // build birkman grid
   $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
@@ -83,7 +110,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
   // tell slack we're all good
   return new Response(
       'OK',
-      200
+      Response::HTTP_OK
   );
 });
 
