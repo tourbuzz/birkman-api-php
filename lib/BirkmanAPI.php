@@ -201,24 +201,31 @@ class BirkmanAPI
         $userAData = json_decode($userAData, true);
         $userBData = json_decode($userBData, true);
 
-        // organize data for graph -- userA usuals vs userB needs
-        foreach ($userAData['components'] as $component => $value) {
-            if (preg_match('/(.*)_usual/', $component, $matches)) {
-                $component = $matches[1];
-                if ($component === 'freedom') continue;
-                $userAUsuals[$component] = $value;
-            }
+        // find components with major diff's between a.usual and b.need
+        $componentComparison = [];
+        foreach ($components as $component => $componentData) {
+            $userAUsual = $userAData["components"]["{$component}_usual"];
+            $userBNeed = $userBData["components"]["{$component}_need"];
+            $componentDiff = abs($userAUsual - $userBNeed);
+            $userAUsualRange = $userAUsual >= 50 ? 'high' : 'low';
+            $userBNeedRange = $userBNeed >= 50 ? 'high' : 'low';
+            $componentComparison[$component] = [
+                'component'            => $component,
+                'yourUsual'            => $userAUsual,
+                'theirNeed'            => $userBNeed,
+                'diff'                 => $componentDiff,
+                'yourUsualExplanation' => $components[$component]['usual'][$userAUsualRange],
+                'theirNeedExplanation' => $components[$component]['need'][$userBNeedRange]
+            ];
         }
-        ksort($userAUsuals); // sort by component to align data
-
-        foreach ($userBData['components'] as $component => $value) {
-            if (preg_match('/(.*)_need/', $component, $matches)) {
-                $component = $matches[1];
-                if ($component === 'freedom') continue;
-                $userBNeeds[$component] = $value;
-            }
-        }
-        ksort($userBNeeds); // sort by component to align data
+        // sort by order of descending diff
+        uasort($componentComparison, function($a, $b) { return $a['diff'] < $b['diff']; });
+        $userAUsuals = array_map(function($component) {
+            return $component['yourUsual'];
+        }, $componentComparison);
+        $userBNeeds = array_map(function($component) use ($componentComparison) {
+            return $component['theirNeed'];
+        }, $componentComparison);
 
 		// Setup the graph
 		$graph = new Graph\Graph(700,700);
@@ -271,26 +278,9 @@ class BirkmanAPI
         if (!$ok) throw new Exception("failed to copy");
         // END temp
 
-        // find components with major diff's between a.usual and b.need
-        $highlights = [];
-        foreach ($components as $component => $componentData) {
-            $componentDiff = abs($userAData["components"]["{$component}_usual"] - $userBData["components"]["{$component}_need"]);
-            $userAUsualRange = $userAData["components"]["{$component}_usual"] >= 50 ? 'high' : 'low';
-            $userBNeedRange = $userBData["components"]["{$component}_need"] >= 50 ? 'high' : 'low';
-            if ($componentDiff > 20) {
-                $highlights[$component] = [
-                    'diff'                 => $componentDiff,
-                    'yourUsualExplanation' => $components[$component]['usual'][$userAUsualRange],
-                    'theirNeedExplanation' => $components[$component]['need'][$userBNeedRange]
-                ];
-            }
-        }
-        // sort by order of descending diff
-        uasort($highlights, function($a, $b) { return $a['diff'] < $b['diff']; });
-
         return [
             'graphImg' => file_get_contents($tmpfile),
-            'criticalComponents' => $highlights
+            'criticalComponents' => array_filter($componentComparison, function($component) { return $component['diff'] > 20; })
         ];
     }
 }
