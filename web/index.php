@@ -16,6 +16,7 @@ function postAsJSONToSlack($responseUrl, $data) {
 			'content' => json_encode($data)
 		]
 	];
+    print_r($data);
 	$jsonPosterStreamContext = stream_context_create($streamOpts);
 	file_get_contents($responseUrl, null, $jsonPosterStreamContext);
 }
