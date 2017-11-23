@@ -5,6 +5,21 @@ require('../vendor/autoload.php');
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
+function postAsJSONToSlack($responseUrl, $data) {
+	$streamOpts = [
+		'http' => [
+			'method'  => 'POST',
+			'timeout' => '30',
+			'header'  => join(PHP_EOL, [
+				"Content-type: application/json",
+			]) . PHP_EOL,
+			'content' => json_encode($data)
+		]
+	];
+	$jsonPosterStreamContext = stream_context_create($streamOpts);
+	file_get_contents($responseUrl, null, $jsonPosterStreamContext);
+}
+
 $app = new Silex\Application();
 $app['debug'] = true;
 $app['base_dir'] = __DIR__.'/..';
@@ -28,6 +43,21 @@ $app->get('/', function() use($app) {
     return $app['twig']->render('index.twig');
 });
 
+$app->get('/grid', function() use($app) {
+    $birkmanData = $app['birkman_repository']->fetchBySlackUsername($slackUser);
+    $grid = new \BirkmanGrid($birkmanData['birkman_data']);
+    ob_start();
+    $grid->asPNG();
+    $imageData = ob_get_contents();
+    ob_end_clean();
+
+    // respond to slack
+    return new Response(
+        $imageData,
+        200
+    );
+});
+
 $app->get('/slack-slash-command/', function(Request $request) use($app) {
     $app['monolog']->addDebug('Requested Birkman GRID');
     $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
@@ -37,6 +67,9 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
     if ($slackToken !== getenv('SLACK_TOKEN')) {
         $app->abort(403, "token does not match app's configured SLACK_TOKEN");
     }
+
+    // grab url to post responses to
+    $slack_response_url = $request->query->get('response_url');
 
     // Parse out the birkman slash command
     // /birkman GTW013 sjhdf skdfjh
@@ -68,8 +101,8 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
             $imageData = ob_get_contents();
             ob_end_clean();
 
-            //hack
-file_put_contents(__DIR__ . '/../webgrid.png', $imageData);
+            postAsJSONToSlack($slack_response_url, ['text' => 'fooo']);
+
             // respond to slack
             return new Response(
                 'OK',
