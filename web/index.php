@@ -126,7 +126,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
 
             // respond to slack
             return new Response(
-                'OK',
+                '',
                 Response::HTTP_OK
             );
             break;
@@ -152,7 +152,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
 
             // respond to slack
             return new Response(
-                'OK',
+                '',
                 Response::HTTP_OK
             );
             break;
