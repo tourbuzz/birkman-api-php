@@ -113,6 +113,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
                 ]
             ]);
 
+
             // respond to slack
             return new Response(
                 'OK',
