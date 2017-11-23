@@ -47,6 +47,30 @@ class BirkmanRepository
      * @return false|array
      * @throws RecordNotFoundException
      */
+    public function fetchByBirkmanId(string $birkmanId)
+    {
+        $stmt = $this->conn->prepare('
+            SELECT * FROM birkman_data WHERE birkman_id = :birkman_id LIMIT 1;
+        ');
+        $stmt->bindParam(':birkman_id', $birkmanId);
+        $stmt->execute();
+
+        $record = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $record['birkman_data'] = json_decode($record['birkman_data'], true);
+
+        if (!$record) {
+            throw new \RecordNotFoundException("Record not found by birkman ID " . $birkmanId);
+        }
+
+        return $record;
+    }
+
+    /**
+     * @param string $slackUsername
+     * @return false|array
+     * @throws RecordNotFoundException
+     */
     public function fetchBySlackUsername(string $slackUsername)
     {
         $stmt = $this->conn->prepare('

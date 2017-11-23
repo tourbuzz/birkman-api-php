@@ -43,8 +43,9 @@ $app->get('/', function() use($app) {
     return $app['twig']->render('index.twig');
 });
 
-$app->get('/grid', function() use($app) {
-    $birkmanData = $app['birkman_repository']->fetchBySlackUsername($slackUser);
+$app->get('/grid', function(Request $request) use($app) {
+    $birkmanId = $request->query->get('birkman_id');
+    $birkmanData = $app['birkman_repository']->fetchByBirkmanId($birkmanId);
     $grid = new \BirkmanGrid($birkmanData['birkman_data']);
     ob_start();
     $grid->asPNG();
@@ -54,7 +55,8 @@ $app->get('/grid', function() use($app) {
     // respond to slack
     return new Response(
         $imageData,
-        200
+        200,
+        ['Content-Type' => 'image/png']
     );
 });
 
@@ -101,7 +103,15 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
             $imageData = ob_get_contents();
             ob_end_clean();
 
-            postAsJSONToSlack($slack_response_url, ['text' => 'fooo']);
+            postAsJSONToSlack($slack_response_url, [
+                'attachments' => [
+                    [
+                        "title"     => "Birkman Grid for {$birkmanData['birkman_data']['name']}",
+                        "fallback"  => "Birkman Grid image",
+                        "image_url" => "https://{$request->getHost()}:{$request->getPort()}/grid/{$birkmanData['birkman_id']}"
+                    ]
+                ]
+            ]);
 
             // respond to slack
             return new Response(
@@ -128,8 +138,6 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
 
             // run report
             $birkmanData = $birkman->getAlastairsComparativeReport($userABirkman['birkman_data'], $userBBirkman['birkman_data']);
-            print_r($birkmanData['criticalComponents']);
-            die();
 
             // respond to slack
             return new Response(
