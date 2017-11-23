@@ -109,7 +109,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
                     [
                         "title"     => "Birkman Grid for {$birkmanData['birkman_data']['name']}",
                         "fallback"  => "Birkman Grid image",
-                        "image_url" => "https://{$request->getHost()}:{$request->getPort()}/grid/{$birkmanData['birkman_id']}"
+                        "image_url" => "https://{$request->getHost()}:{$request->getPort()}/grid?birkman_id={$birkmanData['birkman_id']}"
                     ]
                 ]
             ]);
