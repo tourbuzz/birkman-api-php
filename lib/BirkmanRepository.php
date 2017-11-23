@@ -57,6 +57,8 @@ class BirkmanRepository
 
         $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        $record['birkman_data'] = json_decode($record['birkman_data'], true);
+
         if (!$record) {
             throw new \RecordNotFoundException("Record not found by slack username " . $slackUsername);
         }

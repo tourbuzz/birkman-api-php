@@ -5,7 +5,7 @@ class BirkmanGrid
     private $gridIm;
     private $gridCanvas;
 
-    public function __construct($coreData)
+    public function __construct($birkmanData)
     {
         $this->gridIm  = imagecreatefrompng(__DIR__ . '/../birkman-img/lifestyle_grid_base.png');
         if (!$this->gridIm)
@@ -18,7 +18,7 @@ class BirkmanGrid
         $this->gridCanvas['100']['x'] = 646;
         $this->gridCanvas['100']['y'] = 616;
 
-        $this->drawGrid($coreData);
+        $this->drawGrid($birkmanData);
     }
 
     public function __destruct()

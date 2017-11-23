@@ -28,36 +28,6 @@ $app->get('/', function() use($app) {
     return $app['twig']->render('index.twig');
 });
 
-$app->get('/grid/', function(Request $request) use($app) {
-    $app['monolog']->addDebug('Requested Birkman GRID');
-
-    $slackToken = $request->query->get('token');
-    if ($slackToken !== getenv('SLACK_TOKEN')) {
-        $app->abort(403, "token does not match app's configured SLACK_TOKEN");
-    }
-
-    // look up "birkman id" from slack profile
-    // /birkman GTW013 sjhdf skdfjh
-    // text=GTW013 sjhdf skdfjh
-    $userId = $request->query->get('text');
-
-    // build birkman grid
-    $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
-    $birkmanData = $birkman->getUserCoreData($userId);
-    $grid = new \BirkmanGrid($birkmanData);
-    ob_start();
-    $grid->asPNG();
-    $imageData = ob_get_contents();
-    ob_end_clean();
-
-    // return response
-    return new Response(
-        $imageData,
-        200,
-        ['Content-Type' => 'image/png']
-    );
-});
-
 $app->get('/slack-slash-command/', function(Request $request) use($app) {
     $app['monolog']->addDebug('Requested Birkman GRID');
     $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
@@ -76,10 +46,36 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
     // Clean up commandFromSlack
     $commandFromSlack = preg_replace('/\s+/', ' ', $commandFromSlack);
     list($birkmanCommand, $birkmanCommandArgsString) = explode(' ', $commandFromSlack, 2);
-    $birkmanCommandArgs = explode(' ', $birkmanCommandArgsString);
+    $birkmanCommandArgs = array_filter(explode(' ', $birkmanCommandArgsString));
 
     try {
         switch ($birkmanCommand) {
+        // show birkman grid
+        case 'grid':
+            // `grid [@slackusername]`
+            // if slackusername is omitted, A will be the "current user"
+            if (count($birkmanCommandArgs) == 0) {
+                $slackUser = $request->query->get('user_name');
+            } elseif (count($birkmanCommandArgs) == 1) {
+                $slackUser = trim($birkmanCommandArgs[0], '@');
+            } else {
+                throw new \Exception("Expected 0 or 1 arguments, got " . count($birkmanCommandArgs));
+            }
+            $birkmanData = $app['birkman_repository']->fetchBySlackUsername($slackUser);
+            $grid = new \BirkmanGrid($birkmanData['birkman_data']);
+            ob_start();
+            $grid->asPNG();
+            $imageData = ob_get_contents();
+            ob_end_clean();
+
+            //hack
+file_put_contents(__DIR__ . '/../webgrid.png', $imageData);
+            // respond to slack
+            return new Response(
+                'OK',
+                Response::HTTP_OK
+            );
+            break;
         case 'compare':
             // `compare [@slackusernameA] @slackusernameB`
             // if slackusernameA is omitted, A will be the "current user"
@@ -94,8 +90,8 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
             }
 
             // Translate slack username to birkman user ids
-            $userABirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserA);
-            $userBBirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserB);
+            $userABirkman = $app['birkman_repository']->fetchBySlackUsername($slackUserA);
+            $userBBirkman = $app['birkman_repository']->fetchBySlackUsername($slackUserB);
 
             // run report
             $birkmanData = $birkman->getAlastairsComparativeReport($userABirkman['birkman_data'], $userBBirkman['birkman_data']);
@@ -113,6 +109,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
         }
     } catch (\Exception $e) {
         $app['monolog']->addDebug($e->getMessage());
+        die($e->getMessage);
         // Return a response instead of blowing up.
         return new Response(
             $e->getMessage(),

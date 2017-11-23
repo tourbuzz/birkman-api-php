@@ -32,7 +32,7 @@ class BirkmanAPI
         $dataLength = ftell($xmlStream);
         rewind($xmlStream);
 
-        $ch = curl_init(); 
+        $ch = curl_init();
         curl_setopt_array($ch, [
             CURLOPT_URL            => 'https://api.birkman.com/xml-3.0-catalog.php',
             CURLOPT_CUSTOMREQUEST  => 'POST',
@@ -76,7 +76,7 @@ class BirkmanAPI
         {
             throw new Exception("Error parsing response string:\n{$response}\n");
         }
-        
+
         $catalogResponse = [];
 
         $assessmentCatalog->registerXPathNamespace('birkman', 'http://www.hr-xml.org/3');
@@ -119,7 +119,7 @@ class BirkmanAPI
         $dataLength = ftell($xmlStream);
         rewind($xmlStream);
 
-        $ch = curl_init(); 
+        $ch = curl_init();
         curl_setopt_array($ch, [
             CURLOPT_URL            => 'https://api.birkman.com/xml-3.0-report.php',
             CURLOPT_CUSTOMREQUEST  => 'POST',
@@ -197,9 +197,6 @@ class BirkmanAPI
     public function getAlastairsComparativeReport($userAData, $userBData)
     {
         $components = $this->getComponentVerbiage();
-
-        $userAData = json_decode($userAData, true);
-        $userBData = json_decode($userBData, true);
 
         // find components with major diff's between a.usual and b.need
         $componentComparison = [];
