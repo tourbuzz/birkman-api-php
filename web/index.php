@@ -173,22 +173,19 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
 $app->match('/admin/users', function(Silex\Application $app, \Symfony\Component\HttpFoundation\Request $request) {
     /** @var BirkmanRepository $birkmanRepository */
     $birkmanRepository = $app['birkman_repository'];
+    $birkmanAPI = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
 
     $users = $birkmanRepository->fetchAll();
 
-    // HACK to update all birkman datas...
-    $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
-    foreach ($users as $user) {
-        $birkmanData = $birkman->getUserCoreData($user['birkman_id']);
-        $birkmanRepository->updateBirkmanData($user['birkman_id'], json_encode($birkmanData));
-    }
-
     if ($request->getMethod() === 'POST') {
         if ($request->request->has('insert')) {
+            $birkmanId = $request->request->get('birkman_id');
             $birkmanRepository->createUser(
-                $request->request->get('birkman_id'),
+                $birkmanId,
                 $request->request->get('slack_username')
             );
+            $birkmanData = $birkmanAPI->getUserCoreData($birkmanId);
+            $birkmanRepository->updateBirkmanData($birkmanId, json_encode($birkmanData));
         } elseif ($request->request->has('delete')) {
             $birkmanRepository->delete($request->request->get('birkman_id'));
         }
