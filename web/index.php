@@ -21,6 +21,16 @@ function postAsJSONToSlack($responseUrl, $data) {
 	file_get_contents($responseUrl, null, $jsonPosterStreamContext);
 }
 
+function getAppBaseUrl($request)
+{
+    $url = $request->getSchemeAndHttpHost();
+    $port80 = strpos($url, ':80');
+    if ($port80 !== false) {
+        $url = substr($url, 0, $port80);
+    }
+    return $url;
+}
+
 $app = new Silex\Application();
 $app['debug'] = true;
 $app['base_dir'] = __DIR__.'/..';
@@ -109,7 +119,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
                     [
                         "title"     => "Birkman Grid for {$birkmanData['birkman_data']['name']}",
                         "fallback"  => "Birkman Grid image",
-                        "image_url" => "{$request->getSchemeAndHttpHost()}/grid?birkman_id={$birkmanData['birkman_id']}"
+                        "image_url" => getAppBaseUrl($request) . "/grid?birkman_id={$birkmanData['birkman_id']}"
                     ]
                 ]
             ]);
