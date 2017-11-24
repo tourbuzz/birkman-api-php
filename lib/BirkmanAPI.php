@@ -191,6 +191,12 @@ class BirkmanAPI
         return $components;
     }
 
+    public function getComponentPrettyLabels()
+    {
+        $components = $this->getComponentVerbiage();
+        return array_map(function($component) { return $component['label']; }, $components);
+    }
+
     /**
      * User A talks to user B... what's important to know?
      */

@@ -70,9 +70,27 @@ $app->get('/grid', function(Request $request) use($app) {
     );
 });
 
+$app->get('/alastairs-comparative-graph', function(Request $request) use($app) {
+    $userABirkmanId = $request->query->get('birkman_id_a');
+    $userBBirkmanId = $request->query->get('birkman_id_b');
+
+    $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+    $userABirkman = $app['birkman_repository']->fetchByBirkmanId($userABirkmanId);
+    $userBBirkman = $app['birkman_repository']->fetchByBirkmanId($userBBirkmanId);
+    $alastairsReportData = @$birkman->getAlastairsComparativeReport($userABirkman['birkman_data'], $userBBirkman['birkman_data']);
+
+    // respond to slack
+    return new Response(
+        $alastairsReportData['graphImg'],
+        200,
+        ['Content-Type' => 'image/png']
+    );
+});
+
 $app->get('/slack-slash-command/', function(Request $request) use($app) {
     $app['monolog']->addDebug('Requested Birkman GRID');
     $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+    $componentLabels = $birkman->getComponentPrettyLabels();
 
     $slackToken = $request->query->get('token');
 
@@ -148,7 +166,39 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
             $userBBirkman = $app['birkman_repository']->fetchBySlackUsername($slackUserB);
 
             // run report
-            $birkmanData = $birkman->getAlastairsComparativeReport($userABirkman['birkman_data'], $userBBirkman['birkman_data']);
+            $alastairsReportData = $birkman->getAlastairsComparativeReport($userABirkman['birkman_data'], $userBBirkman['birkman_data']);
+            $graphUrl = getAppBaseUrl($request) . "/alastairs-comparative-graph?birkman_id_a={$userABirkman['birkman_data']}&birkman_id_b={$userBBirkman['birkman_data']}";
+
+            $slackMessage = [];
+            $slackMessage['attachments'][] = [
+                        "title"     => "Your Usual Their Need: Components of Interest when {$userABirkman['birkman_data']['name']} is talking to {$userBBirkman['birkman_data']['name']}",
+                        "fallback"  => "Graph of your usual vs their needs",
+                        "image_url" => $graphUrl
+                    ];
+            foreach ($alastairsReportData['criticalComponents'] as $component) {
+                $slackMessage['attachments'][] = [
+                    "pretext"   => $componentLabels[$component['component']],
+                    "fields"    => [
+                        [
+                            "title" => "Difference",
+                            "value" => $component['diff'],
+                            "short" => true
+                        ],
+                        [
+                            "title" => "Your Usual ({$component['yourUsual']})",
+                            "value" => $component['yourUsualExplanation'],
+                            "short" => false
+                        ],
+                        [
+                            "title" => "Their Need ({$component['theirNeed']})",
+                            "value" => $component['theirNeedExplanation'],
+                            "short" => false
+                        ],
+                    ]
+                ];
+            }
+
+            postAsJSONToSlack($slack_response_url, $slackMessage);
 
             // respond to slack
             return new Response(
