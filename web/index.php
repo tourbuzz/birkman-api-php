@@ -167,7 +167,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
 
             // run report
             $alastairsReportData = $birkman->getAlastairsComparativeReport($userABirkman['birkman_data'], $userBBirkman['birkman_data']);
-            $graphUrl = getAppBaseUrl($request) . "/alastairs-comparative-graph?birkman_id_a={$userABirkman['birkman_data']}&birkman_id_b={$userBBirkman['birkman_data']}";
+            $graphUrl = getAppBaseUrl($request) . "/alastairs-comparative-graph?birkman_id_a={$userABirkman['birkman_id']}&birkman_id_b={$userBBirkman['birkman_id']}";
 
             $slackMessage = [];
             $slackMessage['attachments'][] = [
