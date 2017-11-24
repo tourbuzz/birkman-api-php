@@ -22,39 +22,6 @@
             "high": "The higher someone’s Physical Energy needs, the more that person will need opportunities for varied physical action, social outlets for energy, and a busy schedule."
         }
     },
-    "advantage": {
-        "label": "Incentives",
-        "usual": {
-            "low": "The lower someone’s Incentives usual behavior, the more often that person will be trustful and team-spirited, aware of long-term benefits, value intangibles, and be oriented towards general benefit.",
-            "high": "The higher someone’s Incentives usual behavior, the more often that person will be opportunity minded, resourceful, naturally bargain, sell, trade, and be oriented toward individual advantage."
-        },
-        "need": {
-            "low": "The lower someone’s Incentives needs, the more that person will need a minimum of competitive rivalry, a trustful, serving environment, and an environment based on trust.",
-            "high": "The higher someone’s Incentives needs, the more that person will need opportunities to compete, tangible benefits, and a means of measuring personal performance."
-        }
-    },
-    "authority": {
-        "label": "Assertiveness",
-        "usual": {
-            "low": "The lower someone’s Assertiveness usual behavior, the more often that person will be suggestive, deferent and agreeable, democratic, and low-key in the exercise of authority.",
-            "high": "The higher someone’s Assertiveness usual behavior, the more often that person will seek to influence and convince, be self-assertive, express differences of opinion, and be directive and commanding."
-        },
-        "need": {
-            "low": "The lower someone’s Assertiveness needs, the more that person will need agreeable relationships, autonomy, a suggesting style from others, and a non-directive, democratic environment.",
-            "high": "The higher someone’s Assertiveness needs, the more that person will need clarity of accountability, defined lines of authority, opportunities to discuss and debate, and to know who is in charge."
-        }
-    },
-    "change": {
-        "label": "Restlessness",
-        "usual": {
-            "low": "The lower someone’s Restlessness usual behavior, the more often that person will be concentrative, not easily distracted, patient with long-range projects, and will concentrate attentions well.",
-            "high": "The higher someone’s Restlessness usual behavior, the more often that person will be ready to start new things, easy to stimulate, responsive and attentive, and will like a variety of simultaneous tasks."
-        },
-        "need": {
-            "low": "The lower someone’s Restlessness needs, the more that person will need opportunity for input before changes are initiated, a minimum of abrupt changes, and adequate notice of any change.",
-            "high": "The higher someone’s Restlessness needs, the more that person will need alternating work responsibilities, opportunities to shift priorities when new interests arise, and plenty of different calls on attention."
-        }
-    },
     "empathy": {
         "label": "Emotional Energy",
         "usual": {
@@ -77,6 +44,17 @@
             "high": "The higher someone’s Self-Consciousness needs, the more that person will need respect, focus from significant individuals, and respect of key individuals."
         }
     },
+    "authority": {
+        "label": "Assertiveness",
+        "usual": {
+            "low": "The lower someone’s Assertiveness usual behavior, the more often that person will be suggestive, deferent and agreeable, democratic, and low-key in the exercise of authority.",
+            "high": "The higher someone’s Assertiveness usual behavior, the more often that person will seek to influence and convince, be self-assertive, express differences of opinion, and be directive and commanding."
+        },
+        "need": {
+            "low": "The lower someone’s Assertiveness needs, the more that person will need agreeable relationships, autonomy, a suggesting style from others, and a non-directive, democratic environment.",
+            "high": "The higher someone’s Assertiveness needs, the more that person will need clarity of accountability, defined lines of authority, opportunities to discuss and debate, and to know who is in charge."
+        }
+    },
     "structure": {
         "label": "Insistence",
         "usual": {
@@ -86,6 +64,28 @@
         "need": {
             "low": "The lower someone’s Insistence needs, the more that person will need freedom from close control, minimal routine, easy access to others, and only an outline plan to follow.",
             "high": "The higher someone’s Insistence needs, the more that person will need defined systems and procedures, predictability, organizational support, and a definite plan in place."
+        }
+    },
+    "advantage": {
+        "label": "Incentives",
+        "usual": {
+            "low": "The lower someone’s Incentives usual behavior, the more often that person will be trustful and team-spirited, aware of long-term benefits, value intangibles, and be oriented towards general benefit.",
+            "high": "The higher someone’s Incentives usual behavior, the more often that person will be opportunity minded, resourceful, naturally bargain, sell, trade, and be oriented toward individual advantage."
+        },
+        "need": {
+            "low": "The lower someone’s Incentives needs, the more that person will need a minimum of competitive rivalry, a trustful, serving environment, and an environment based on trust.",
+            "high": "The higher someone’s Incentives needs, the more that person will need opportunities to compete, tangible benefits, and a means of measuring personal performance."
+        }
+    },
+    "change": {
+        "label": "Restlessness",
+        "usual": {
+            "low": "The lower someone’s Restlessness usual behavior, the more often that person will be concentrative, not easily distracted, patient with long-range projects, and will concentrate attentions well.",
+            "high": "The higher someone’s Restlessness usual behavior, the more often that person will be ready to start new things, easy to stimulate, responsive and attentive, and will like a variety of simultaneous tasks."
+        },
+        "need": {
+            "low": "The lower someone’s Restlessness needs, the more that person will need opportunity for input before changes are initiated, a minimum of abrupt changes, and adequate notice of any change.",
+            "high": "The higher someone’s Restlessness needs, the more that person will need alternating work responsibilities, opportunities to shift priorities when new interests arise, and plenty of different calls on attention."
         }
     },
     "thought": {

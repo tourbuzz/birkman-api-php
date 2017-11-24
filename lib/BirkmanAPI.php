@@ -179,6 +179,7 @@ class BirkmanAPI
 
     private function getComponentVerbiage()
     {
+        // the items in component-verbiage.json are sorted in the official "birkman" order
         $json = file_get_contents(__DIR__ . '/../lib/component-verbiage.json');
         if ($json === false) {
             throw new Exception("couldn't load component-verbiage.json");
@@ -187,7 +188,6 @@ class BirkmanAPI
         if ($components === NULL) {
             throw new Exception("couldn't parse component-verbiage.json");
         }
-        ksort($components);
         return $components;
     }
 
@@ -221,8 +221,8 @@ class BirkmanAPI
                 'theirNeedExplanation' => $components[$component]['need'][$userBNeedRange]
             ];
         }
-        // sort by order of descending diff
-        uasort($componentComparison, function($a, $b) { return $a['diff'] < $b['diff']; });
+        // sort by order of descending diff -- it was decided to leave this instead in "birkman order"
+        //uasort($componentComparison, function($a, $b) { return $a['diff'] < $b['diff']; });
         $userAUsuals = array_map(function($component) {
             return $component['yourUsual'];
         }, $componentComparison);
