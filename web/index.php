@@ -197,6 +197,10 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
                     ]
                 ];
             }
+            $slackMessage['attachments'][] = [
+                "title"      => "Give some feedback on this...",
+                "title_link" => "https://goo.gl/forms/OK75wXGmr13GR59z2",
+            ];
 
             postAsJSONToSlack($slack_response_url, $slackMessage);
 
