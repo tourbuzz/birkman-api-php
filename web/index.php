@@ -60,7 +60,7 @@ $app->match('/admin/users', function(Silex\Application $app, \Symfony\Component\
                 $request->request->get('slack_username')
             );
         } elseif ($request->request->has('delete')) {
-            $birkmanRepository->delete($request->request->get('birkman_id'));
+            $birkmanRepository->delete($request->request->get('delete'));
         }
 
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
