@@ -45,7 +45,7 @@ $app->register(new Silex\Provider\MonologServiceProvider(), array(
 
 // Register view rendering
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => __DIR__.'/views',
+    'twig.path' => $app['base_dir'].'/views',
 ));
 
 // Our web handlers
@@ -241,7 +241,7 @@ $app->match('/admin/users', function(Silex\Application $app, \Symfony\Component\
             $birkmanData = $birkmanAPI->getUserCoreData($birkmanId);
             $birkmanRepository->updateBirkmanData($birkmanId, json_encode($birkmanData));
         } elseif ($request->request->has('delete')) {
-            $birkmanRepository->delete($request->request->get('birkman_id'));
+            $birkmanRepository->delete($request->request->get('delete'));
         }
 
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
