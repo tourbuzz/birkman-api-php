@@ -252,7 +252,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
             $slackUser = $request->query->get('user_name');
             $birkmanData = $app['birkman_repository']->fetchBySlackUsername($slackUser);
             if ($birkmanData) {
-                $userinfo = "Hi, @slackUser! We've got you linked to Birkman ID {$birkmanData['birkman_data']['name']} ({$birkmanData['birkman_id']}).";
+                $userinfo = "Hi, @{$slackUser}! We've got you linked to Birkman ID {$birkmanData['birkman_data']['name']} ({$birkmanData['birkman_id']}).";
             } else {
                 $userinfo = "No birkman profile is on file for @{$slackUser}. Try:\n`/birkman register XXXYYY`.";
             }
