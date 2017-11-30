@@ -215,7 +215,7 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
         }
     } catch (\Exception $e) {
         $app['monolog']->addDebug($e->getMessage());
-        die($e->getMessage());
+
         // Return a response instead of blowing up.
         return new Response(
             $e->getMessage(),
