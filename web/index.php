@@ -18,6 +18,7 @@ function postAsJSONToSlack($responseUrl, $data) {
 	];
 	$jsonPosterStreamContext = stream_context_create($streamOpts);
 	file_get_contents($responseUrl, null, $jsonPosterStreamContext);
+    //print_r($data);
 }
 
 function getAppBaseUrl($request)
@@ -125,6 +126,10 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
                 throw new \Exception("Expected 0 or 1 arguments, got " . count($birkmanCommandArgs));
             }
             $birkmanData = $app['birkman_repository']->fetchBySlackUsername($slackUser);
+            if (!$birkmanData) {
+                throw new \Exception("No Birkman profile is registered for @{$slackUser}");
+            }
+
             $grid = new \BirkmanGrid($birkmanData['birkman_data']);
             ob_start();
             $grid->asPNG();
@@ -163,7 +168,13 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
 
             // Translate slack username to birkman user ids
             $userABirkman = $app['birkman_repository']->fetchBySlackUsername($slackUserA);
+            if (!$userABirkman) {
+                throw new \Exception("No Birkman profile is registered for @{$slackUserA}");
+            }
             $userBBirkman = $app['birkman_repository']->fetchBySlackUsername($slackUserB);
+            if (!$userBBirkman) {
+                throw new \Exception("No Birkman profile is registered for @{$slackUserB}");
+            }
 
             // run report
             $alastairsReportData = $birkman->getAlastairsComparativeReport($userABirkman['birkman_data'], $userBBirkman['birkman_data']);
