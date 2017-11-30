@@ -147,6 +147,10 @@ class BirkmanAPI
         return $response;
     }
 
+    /**
+     * @param string Birkman ID
+     * @return NULL|array
+     */
     public function getUserCoreData($userId)
     {
         $coreReportId = 2402262;    // not sure if this reportId is the same report for any Birkman account/catalog? pretty random ID number...
@@ -156,6 +160,9 @@ class BirkmanAPI
         // register namespace
         $xml->registerXPathNamespace('oa', 'http://www.hr-xml.org/3');
 		$result = $xml->xpath('//oa:GivenName');
+        if (empty($result)) {
+            return NULL;
+        }
 
         $birkmanData = [];
         $birkmanData['name'] = $xml->xpath('//oa:GivenName')[0] . ' ' . $xml->DataArea->AssessmentReport->AssessmentSubject->PersonName->FamilyName;

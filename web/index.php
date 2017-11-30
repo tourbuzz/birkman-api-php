@@ -18,6 +18,7 @@ function postAsJSONToSlack($responseUrl, $data) {
 	];
 	$jsonPosterStreamContext = stream_context_create($streamOpts);
 	file_get_contents($responseUrl, null, $jsonPosterStreamContext);
+    print_r($data);
 }
 
 function getAppBaseUrl($request)
@@ -210,8 +211,76 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
                 Response::HTTP_OK
             );
             break;
+        case 'register':
+            $slackUser = $request->query->get('user_name');
+
+            if (count($birkmanCommandArgs) == 1) {
+                $birkmanId = $birkmanCommandArgs[0];
+                if (!preg_match('/[A-Z0-9]{6}/', $birkmanId)) {
+                    throw new \Exception("Birkan ID ({$birkmanId}) doesn't look right...");
+                }
+            } else {
+                throw new \Exception("Expected 1 argument, got " . count($birkmanCommandArgs));
+            }
+
+            // already exists?
+            $birkmanRepository = $app['birkman_repository'];
+            $birkmanData = $app['birkman_repository']->fetchByBirkmanId($birkmanId);
+            if ($birkmanData) {
+                $msg = "Birkman ID ({$birkmanId}) is already registered to @{$birkmanData['slack_username']}.";
+            } else {
+                $birkmanAPI = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+                $birkmanData = $birkmanAPI->getUserCoreData($birkmanId);
+                if ($birkmanData) {
+                    $birkmanRepository->createUser($birkmanId, $slackUser);
+                    $birkmanRepository->updateBirkmanData($birkmanId, json_encode($birkmanData));
+                    $msg = "Birkman ID ({$birkmanId}) successfully registered to @{$slackUser}.";
+                } else {
+                    $msg = "No Birkman report found for ID ({$birkmanId}).";
+                }
+            }
+
+            postAsJSONToSlack($slack_response_url, [ 'text' => $msg ]);
+
+            // respond to slack
+            return new Response(
+                '',
+                Response::HTTP_OK
+            );
+            break;
+        case 'help':
         default:
-            throw new \Exception("Command '{$birkmanCommand}' does not exist.");
+            $slackUser = $request->query->get('user_name');
+            $birkmanData = $app['birkman_repository']->fetchBySlackUsername($slackUser);
+            if ($birkmanData) {
+                $userinfo = "Hi, @slackUser! We've got you linked to Birkman ID {$birkmanData['birkman_data']['name']} ({$birkmanData['birkman_id']}).";
+            } else {
+                $userinfo = "No birkman profile is on file for @{$slackUser}. Try:\n`/birkman register XXXYYY`.";
+            }
+
+            $help = <<<END
+Help for `/birkman`
+```
+/birkman grid [@username]               -- See your Birkman Grid, or optionally for specified [@username]
+
+/birkman compare @username              -- Compare your usual behavior to another @username's needs
+/birkman compare @usernameA @usernameB  -- Compare @usernameA's usual behavior to @usernameB's needs
+
+/birkman register XXXYYY                -- Register your slack @username to the Birkman ID XXXYYY
+```
+END;
+
+            $help = [
+                'text' => $userinfo . "\n" . $help
+            ];
+
+            postAsJSONToSlack($slack_response_url, $help);
+
+            // respond to slack
+            return new Response(
+                '',
+                Response::HTTP_OK
+            );
         }
     } catch (\Exception $e) {
         $app['monolog']->addDebug($e->getMessage());
