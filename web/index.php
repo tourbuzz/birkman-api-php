@@ -18,7 +18,6 @@ function postAsJSONToSlack($responseUrl, $data) {
 	];
 	$jsonPosterStreamContext = stream_context_create($streamOpts);
 	file_get_contents($responseUrl, null, $jsonPosterStreamContext);
-    print_r($data);
 }
 
 function getAppBaseUrl($request)
