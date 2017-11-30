@@ -211,11 +211,11 @@ $app->get('/slack-slash-command/', function(Request $request) use($app) {
             );
             break;
         default:
-            throw new \RecordNotFoundException("{$birkmanCommand} does not exist.");
+            throw new \Exception("Command '{$birkmanCommand}' does not exist.");
         }
     } catch (\Exception $e) {
         $app['monolog']->addDebug($e->getMessage());
-        die($e->getMessage);
+        die($e->getMessage());
         // Return a response instead of blowing up.
         return new Response(
             $e->getMessage(),
