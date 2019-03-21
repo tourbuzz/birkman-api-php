@@ -1,10 +1,9 @@
 <?php
 
-use Symfony\Component\HttpFoundation\Response;
-
 require('../vendor/autoload.php');
-require('../lib/BirkmanAPI.php');
-require('../lib/BirkmanGrid.php');
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 $app = new Silex\Application();
 $app['debug'] = true;
@@ -29,21 +28,89 @@ $app->get('/', function() use($app) {
   return $app['twig']->render('index.twig');
 });
 
-$app->get('/grid/{userId}', function(Silex\Application $silexApp, $userId) use($app) {
+$app->get('/grid/', function(Request $request) use($app) {
   $app['monolog']->addDebug('Requested Birkman GRID');
 
-  $birkman = new BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+  $slackToken = $request->query->get('token');
+  if ($slackToken !== getenv('SLACK_TOKEN')) {
+      $app->abort(403, "token does not match app's configured SLACK_TOKEN");
+  }
+
+  // look up "birkman id" from slack profile
+  // /birkman GTW013 sjhdf skdfjh
+  // text=GTW013 sjhdf skdfjh
+  $userId = $request->query->get('text');
+
+  // build birkman grid
+  $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
   $birkmanData = $birkman->getUserCoreData($userId);
-  $grid = new BirkmanGrid($birkmanData);
+  $grid = new \BirkmanGrid($birkmanData);
   ob_start();
   $grid->asPNG();
   $imageData = ob_get_contents();
   ob_end_clean();
 
+  // return response
   return new Response(
       $imageData,
       200,
       ['Content-Type' => 'image/png']
+  );
+});
+
+$app->get('/slack-slash-command/', function(Request $request) use($app) {
+  $app['monolog']->addDebug('Requested Birkman GRID');
+
+  $slackToken = $request->query->get('token');
+
+  if ($slackToken !== getenv('SLACK_TOKEN')) {
+      $app->abort(403, "token does not match app's configured SLACK_TOKEN");
+  }
+
+  // look up "birkman id" from slack profile
+  // /birkman GTW013 sjhdf skdfjh
+  // text=GTW013 sjhdf skdfjh
+  $command = $request->query->get('text');
+  // Clean up command
+  $command = preg_replace('/\s+/', ' ', $command);
+  $parts = explode(' ', $command);
+
+  // Expects slack username A and slack username B.
+  if (count($parts) != 2) {
+    throw new \Exception("Expected exactly two command args got " . count($parts));
+  }
+  $slackUserA = $parts[0];
+  $slackUserB = $parts[1];
+
+  // Translate slack username to birkman user ids
+  try {
+    $userABirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserA);
+    $userBBirkman =$app['birkman_repository']->fetchBySlackUsername($slackUserB);
+    $userABirkmanId = $userABirkman['birkman_id'];
+    $userBBirkmanId = $userBBirkman['birkman_id'];
+  } catch (\RecordNotFoundException $e) {
+    $app['monolog']->addDebug($e->getMessage());
+    // Return a response instead of blowing up.
+    // Users entering wrong or no longer valid slack usernames is sometimes expected.
+    // Also keep in mind at this point the request is trusted (via slack token).
+    return new Response(
+        $e->getMessage(),
+        Response::HTTP_NOT_FOUND
+    );
+  }
+
+  // build birkman grid
+  $birkman = new \BirkmanAPI(getenv('BIRKMAN_API_KEY'));
+  $birkmanData = $birkman->getAlastairsComparativeReport($userABirkmanId, $userBBirkmanId);
+
+  print_r($birkmanData);
+
+  // send responses
+
+  // tell slack we're all good
+  return new Response(
+      'OK',
+      Response::HTTP_OK
   );
 });
 
